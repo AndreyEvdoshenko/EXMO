@@ -1,0 +1,27 @@
+/.gradle
+/.svn
+/.idea
+/*.iml
+/**/*.iml
+bo/bo-templates/target/
+bo/target/
+mvn.bat
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+*.project
+maven-repo/

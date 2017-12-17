@@ -1,4 +1,4 @@
-package ru.exmo.model;
+package ru.exmo.model.data;
 
 import java.math.BigDecimal;
 

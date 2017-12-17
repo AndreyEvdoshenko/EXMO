@@ -1,10 +1,11 @@
-package ru.exmo.model;
+package ru.exmo.model.data;
 
 /**
  * Created by Андрей on 15.12.2017.
  */
 public class exmoTrade {
 
+    currencyPair pair;
     private String trade_id;
     private String type;
     private String price;
@@ -13,6 +14,14 @@ public class exmoTrade {
     private String date;
 
     exmoTrade() {
+    }
+
+    public currencyPair getPair() {
+        return pair;
+    }
+
+    public void setPair(currencyPair pair) {
+        this.pair = pair;
     }
 
     public String getTrade_id() {

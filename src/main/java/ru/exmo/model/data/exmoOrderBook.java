@@ -1,6 +1,7 @@
 package ru.exmo.model.data;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,19 +9,25 @@ import java.util.List;
  */
 public class exmoOrderBook {
 
-    private BigDecimal ask_quantity;    //объем всех ордеров на продажу
-    private BigDecimal ask_amount;      //сумма всех ордеров на продажу
-    private BigDecimal ask_top;         //минимальная цена продажи
-    private BigDecimal bid_quantity;    //объем всех ордеров на покупку
-    private BigDecimal bid_amount;      //сумма всех ордеров на покупку
-    private BigDecimal bid_top;         //максимальная цена покупки
-    private List<order> bid;            //список ордеров на покупку, где каждая строка это цена, количество и сумма
-    private List<order> ask;            //список ордеров на продажу, где каждая строка это цена, количество и сумма
+    private BigDecimal ask_quantity;                        //объем всех ордеров на продажу
+    private BigDecimal ask_amount;                          //сумма всех ордеров на продажу
+    private BigDecimal ask_top;                             //минимальная цена продажи
+    private BigDecimal bid_quantity;                        //объем всех ордеров на покупку
+    private BigDecimal bid_amount;                          //сумма всех ордеров на покупку
+    private BigDecimal bid_top;                             //максимальная цена покупки
+    private List<order> bid = new ArrayList<>();            //список ордеров на покупку, где каждая строка это цена, количество и сумма
+    private List<order> ask = new ArrayList<>();            //список ордеров на продажу, где каждая строка это цена, количество и сумма
 
-    private class order{
+    private class order {
         private BigDecimal price;       //цена
         private BigDecimal quantity;    //количество
         private BigDecimal amount;      //сумма
+
+        public order(BigDecimal price, BigDecimal quantity, BigDecimal amount) {
+            this.price = price;
+            this.quantity = quantity;
+            this.amount = amount;
+        }
 
         public BigDecimal getPrice() {
             return price;
@@ -95,20 +102,35 @@ public class exmoOrderBook {
         this.bid_top = bid_top;
     }
 
-    public List<order> getBid() {
-        return bid;
+    public void addBid(BigDecimal price,BigDecimal quantity,BigDecimal amount){
+        bid.add(new order(price,quantity,amount));
+    }
+    public void clearBid(){
+        bid.clear();
     }
 
-    public void setBid(List<order> bid) {
-        this.bid = bid;
+    public void addAsk(BigDecimal price,BigDecimal quantity,BigDecimal amount){
+        ask.add(new order(price,quantity,amount));
+    }
+    public void clearAsk(){
+        ask.clear();
     }
 
-    public List<order> getAsk() {
-        return ask;
+    public BigDecimal averagebBidPrice() {
+        BigDecimal agvPrice = new BigDecimal(0);
+        for (order current : bid) {
+            agvPrice = agvPrice.add(current.price);
+        }
+        return agvPrice.divide(BigDecimal.valueOf(bid.size()));
     }
 
-    public void setAsk(List<order> ask) {
-        this.ask = ask;
+    public BigDecimal averagebAskPrice() {
+        BigDecimal agvPrice = new BigDecimal(0);
+        for (order current : ask) {
+            agvPrice = agvPrice.add(current.price);
+        }
+        return agvPrice.divide(BigDecimal.valueOf(ask.size()));
     }
+
 
 }

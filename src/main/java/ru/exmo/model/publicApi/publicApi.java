@@ -17,7 +17,7 @@ public interface publicApi {
     public final String EXMO_PAIR_SETTINGS_URL  = "https://api.exmo.com/v1/pair_settings/";
 
     List<exmoTrade> returnTrades(List <currencyPair> pairs);
-    List<exmoOrderBook> returnOrderBook(List <currencyPair> pairs,int limit);
+    Map<currencyPair, exmoOrderBook> returnOrderBook(List <currencyPair> pairs, int limit) throws IOException;
     exmoTicker returnTicker();
     Map<currencyPair,currencyPairSettings> returnPairSettings() throws IOException;
 }

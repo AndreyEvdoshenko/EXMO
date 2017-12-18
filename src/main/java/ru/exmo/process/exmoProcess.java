@@ -1,19 +1,18 @@
 package ru.exmo.process;
 
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.currencyPair;
 import ru.exmo.model.data.currencyPairSettings;
 import ru.exmo.model.data.exmoOrderBook;
-import ru.exmo.model.publicApi.publicApi;
+import ru.exmo.api.publicApi.publicApi;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +21,7 @@ import java.util.Map;
 
 @Component
 public class exmoProcess {
+    private  final Logger logger = Logger.getLogger(exmoProcess.class);
 
     @Autowired
     publicApi publicApi;
@@ -38,8 +38,9 @@ public class exmoProcess {
     @PostConstruct
     public void initProcess(){
         try {
+            logger.info("@PostConstruct initProcess() invoke");
             pairs =  publicApi.returnPairSettings();
-            System.out.println(pairs);
+            logger.info(pairs);
             publicApi.returnOrderBook(Arrays.asList(currencyPair.LTC_USD), 100);
         } catch (IOException e) {
             e.printStackTrace();

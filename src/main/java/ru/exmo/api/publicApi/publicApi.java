@@ -1,4 +1,4 @@
-package ru.exmo.model.publicApi;
+package ru.exmo.api.publicApi;
 
 import ru.exmo.model.data.*;
 

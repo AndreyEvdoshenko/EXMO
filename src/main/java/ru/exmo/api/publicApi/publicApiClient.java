@@ -1,4 +1,4 @@
-package ru.exmo.process.publicApi;
+package ru.exmo.api.publicApi;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.*;
-import ru.exmo.model.publicApi.publicApi;
+import ru.exmo.api.publicApi.publicApi;
 import ru.exmo.process.utils.HTTPClient;
 
 import java.io.IOException;

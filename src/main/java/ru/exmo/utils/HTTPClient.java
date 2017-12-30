@@ -1,4 +1,4 @@
-package ru.exmo.process.utils;
+package ru.exmo.utils;
 
 import org.apache.http.client.methods.HttpPost;
 

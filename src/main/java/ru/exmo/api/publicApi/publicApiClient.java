@@ -7,8 +7,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.*;
-import ru.exmo.api.publicApi.publicApi;
-import ru.exmo.process.utils.HTTPClient;
+import ru.exmo.utils.HTTPClient;
 
 import java.io.IOException;
 import java.lang.reflect.Field;

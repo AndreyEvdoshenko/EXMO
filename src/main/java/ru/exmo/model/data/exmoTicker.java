@@ -1,11 +1,16 @@
 package ru.exmo.model.data;
 
+import org.json.simple.JSONObject;
+
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 /**
  * Created by Андрей on 15.12.2017.
  */
 public class exmoTicker {
+
+    private String pair;
     private BigDecimal high; // максимальная цена сделки за 24 часа
     private BigDecimal low; //  минимальная цена сделки за 24 часа
     private BigDecimal avg; // средняя цена сделки за 24 часа
@@ -14,7 +19,7 @@ public class exmoTicker {
     private BigDecimal last_trade; //  цена последней сделки
     private BigDecimal buy_price; //  текущая максимальная цена покупки
     private BigDecimal sell_price; // текущая минимальная цена продажи
-    private String updated; //  дата и время обновления данных
+    private Timestamp updated; //  дата и время обновления данных
 
     exmoTicker() {
 
@@ -84,12 +89,33 @@ public class exmoTicker {
         this.sell_price = sell_price;
     }
 
-    public String getUpdated() {
+    public Timestamp getUpdated() {
         return updated;
     }
 
-    public void setUpdated(String updated) {
+    public void setUpdated(Timestamp updated) {
         this.updated = updated;
     }
 
+    public String getPair() {
+        return pair;
+    }
+
+    public void setPair(String pair) {
+        this.pair = pair;
+    }
+
+    public  String toString(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sell_price",sell_price);
+        jsonObject.put("buy_price",buy_price);
+        jsonObject.put("last_trade",last_trade);
+        jsonObject.put("vol_curr",vol_curr);
+        jsonObject.put("vol",vol);
+        jsonObject.put("avg",avg);
+        jsonObject.put("low",low);
+        jsonObject.put("high",high);
+        jsonObject.put("pair",pair);
+        return jsonObject.toJSONString();
+    }
 }

@@ -42,6 +42,8 @@ public class exmoProcess {
             pairs =  publicApi.returnPairSettings();
             logger.info(pairs);
             publicApi.returnOrderBook(Arrays.asList(currencyPair.LTC_USD), 100);
+            publicApi.returnTicker();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,7 +59,5 @@ public class exmoProcess {
         }
     return agvPrice;
     }
-
-
 
 }

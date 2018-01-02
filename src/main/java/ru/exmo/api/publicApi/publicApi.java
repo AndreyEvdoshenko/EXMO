@@ -18,6 +18,6 @@ public interface publicApi {
 
     List<exmoTrade> returnTrades(List <currencyPair> pairs);
     Map<currencyPair, exmoOrderBook> returnOrderBook(List <currencyPair> pairs, int limit) throws IOException;
-    exmoTicker returnTicker();
+    List<exmoTicker> returnTicker();
     Map<currencyPair,currencyPairSettings> returnPairSettings() throws IOException;
 }

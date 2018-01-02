@@ -21,7 +21,7 @@ public class exmoTicker {
     private BigDecimal sell_price; // текущая минимальная цена продажи
     private Timestamp updated; //  дата и время обновления данных
 
-    exmoTicker() {
+    public exmoTicker() {
 
     }
 

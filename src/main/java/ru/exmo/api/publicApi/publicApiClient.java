@@ -1,5 +1,6 @@
 package ru.exmo.api.publicApi;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -7,11 +8,14 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.*;
+import ru.exmo.process.exmoProcess;
 import ru.exmo.utils.HTTPClient;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,8 @@ import java.util.Map;
  */
 @Component
 public class publicApiClient implements publicApi {
+
+    private  final Logger logger = Logger.getLogger(exmoProcess.class);
 
     @Autowired
     HTTPClient httpClient;
@@ -81,8 +87,37 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public exmoTicker returnTicker() {
-        return null;
+    public List<exmoTicker> returnTicker() {
+        List<exmoTicker> listTicker = new ArrayList<>();
+        try {
+            String resultJson = httpClient.getHttp(EXMO_TICKER_URL, null);
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+            Timestamp updatedTime = new Timestamp(System.currentTimeMillis());
+            for (Field field : currencyPair.class.getFields()) {
+                currencyPair currentPair = currencyPair.valueOf(field.getName());
+                Map<String, String> currentExmoPair = (Map<String, String>) jsonObject.get(currentPair.name());
+                exmoTicker ticker = new exmoTicker();
+                ticker.setPair(currentPair.name());
+                ticker.setHigh(new BigDecimal(String.valueOf(currentExmoPair.get("high"))));
+                ticker.setLow(new BigDecimal(String.valueOf(currentExmoPair.get("low"))));
+                ticker.setAvg(new BigDecimal(String.valueOf(currentExmoPair.get("avg"))));
+                ticker.setVol(new BigDecimal(String.valueOf(currentExmoPair.get("vol"))));
+                ticker.setVol_curr(new BigDecimal(String.valueOf(currentExmoPair.get("vol_curr"))));
+                ticker.setLast_trade(new BigDecimal(String.valueOf(currentExmoPair.get("last_trade"))));
+                ticker.setBuy_price(new BigDecimal(String.valueOf(currentExmoPair.get("buy_price"))));
+                ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
+                ticker.setUpdated(updatedTime);
+                listTicker.add(ticker);
+                logger.info("ticker :" + ticker);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return listTicker;
     }
 
     @Override

@@ -24,12 +24,7 @@ public class exmoProcess {
     private  final Logger logger = Logger.getLogger(exmoProcess.class);
 
     @Autowired
-    publicApi publicApi;
-    private final String ORDER_TYPE_BUY     = "buy";
-    private final String ORDER_TYPE_SELL    = "sell";
-
-    private Map<currencyPair,currencyPairSettings> pairs;
-    private exmoOrderBook orderBook;
+    private publicApi publicApi;
 
     public exmoProcess()  {
 
@@ -39,25 +34,13 @@ public class exmoProcess {
     public void initProcess(){
         try {
             logger.info("@PostConstruct initProcess() invoke");
-            pairs =  publicApi.returnPairSettings();
-            logger.info(pairs);
-            publicApi.returnOrderBook(Arrays.asList(currencyPair.LTC_USD), 100);
+            publicApi.returnPairSettings();
+            publicApi.returnOrderBook(100);
             publicApi.returnTicker();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    private BigDecimal averagePrice(String type){
-        BigDecimal agvPrice;
-        if(type.equals(ORDER_TYPE_BUY)){
-            agvPrice = orderBook.averagebBidPrice();
-        }else{
-            agvPrice = orderBook.averagebAskPrice();
-        }
-    return agvPrice;
     }
 
 }

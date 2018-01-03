@@ -11,11 +11,6 @@ import java.util.Map;
  */
 public interface publicApi {
 
-    public final String EXMO_TRADES_URL         = "https://api.exmo.com/v1/trades/";
-    public final String EXMO_ORDER_BOOK_URL     = "https://api.exmo.com/v1/order_book/";
-    public final String EXMO_TICKER_URL         = "https://api.exmo.com/v1/ticker/";
-    public final String EXMO_PAIR_SETTINGS_URL  = "https://api.exmo.com/v1/pair_settings/";
-
     /**
      Список сделок по валютной паре
      */

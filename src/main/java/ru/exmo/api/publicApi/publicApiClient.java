@@ -35,7 +35,7 @@ public class publicApiClient implements publicApi {
         logger.info("invoke returnTrades()");
         Map<currencyPair, List<exmoTrade>> tradeMap = new HashMap<>();
 
-        StringBuilder URL = new StringBuilder(EXMO_TRADES_URL);
+        StringBuilder URL = new StringBuilder(publicApiMethods.EXMO_TRADES.getUrl());
         URL.append("?pair=");
         for (Field field : currencyPair.class.getFields()) {
             currencyPair pair = currencyPair.valueOf(field.getName());
@@ -79,7 +79,7 @@ public class publicApiClient implements publicApi {
         logger.info("invoke returnOrderBook()");
         Map<currencyPair, exmoOrderBook> orderBook = new HashMap<>();
 
-        StringBuilder URL = new StringBuilder(EXMO_ORDER_BOOK_URL);
+        StringBuilder URL = new StringBuilder(publicApiMethods.EXMO_ORDER_BOOK.getUrl());
         URL.append("?pair=");
         for (Field field : currencyPair.class.getFields()) {
             currencyPair pair = currencyPair.valueOf(field.getName());
@@ -131,7 +131,7 @@ public class publicApiClient implements publicApi {
         logger.info("invoke returnTicker()");
         List<exmoTicker> listTicker = new ArrayList<>();
         try {
-            String resultJson = httpClient.getHttp(EXMO_TICKER_URL, null);
+            String resultJson = httpClient.getHttp(publicApiMethods.EXMO_TICKER.getUrl(), null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
             Timestamp updatedTime = new Timestamp(System.currentTimeMillis());
             for (Field field : currencyPair.class.getFields()) {
@@ -163,7 +163,7 @@ public class publicApiClient implements publicApi {
     public Map<currencyPair, currencyPairSettings> returnPairSettings() throws IOException {
         logger.info("invoke returnPairSettings()");
         Map<currencyPair, currencyPairSettings> pairSettings = new HashMap<>();
-        String URL = EXMO_PAIR_SETTINGS_URL;
+        String URL = publicApiMethods.EXMO_PAIR_SETTINGS.getUrl();
         try {
             String resultJson = httpClient.getHttp(URL, null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);

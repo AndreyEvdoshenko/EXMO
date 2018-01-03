@@ -26,15 +26,52 @@ import java.util.Map;
 @Component
 public class publicApiClient implements publicApi {
 
-    private  final Logger logger = Logger.getLogger(exmoProcess.class);
+    private final Logger logger = Logger.getLogger(exmoProcess.class);
 
     @Autowired
     HTTPClient httpClient;
 
     @Override
-    public List<exmoTrade> returnTrades() {
+    public Map<currencyPair, List<exmoTrade>> returnTrades() {
         logger.info("invoke returnTrades()");
-        return null;
+        Map<currencyPair, List<exmoTrade>> tradeMap = new HashMap<>();
+
+        StringBuilder URL = new StringBuilder(EXMO_TRADES_URL);
+        URL.append("?pair=");
+        for (Field field : currencyPair.class.getFields()) {
+            currencyPair pair = currencyPair.valueOf(field.getName());
+            URL.append(pair.name()).append(",");
+        }
+        URL.deleteCharAt(URL.length() - 1);
+        try {
+            String resultJson = httpClient.getHttp(URL.toString(), null);
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+            for (Field field : currencyPair.class.getFields()) {
+                currencyPair pair = currencyPair.valueOf(field.getName());
+                JSONArray exmoTradesList = (JSONArray) jsonObject.get(pair.name());
+                List<exmoTrade> pairTradeList = new ArrayList<>();
+                for (int i = 0; i < exmoTradesList.size(); i++) {
+                    exmoTrade trade = new exmoTrade();
+                    Map<String, Object> currentExmoTrade = (Map<String, Object>) exmoTradesList.get(i);
+
+                    trade.setPair(pair.name());
+                    trade.setTrade_id(String.valueOf(currentExmoTrade.get("trade_id")));
+                    trade.setType((String) currentExmoTrade.get("type"));
+                    trade.setPrice((String) currentExmoTrade.get("price"));
+                    trade.setQuantity((String) currentExmoTrade.get("quantity"));
+                    trade.setAmount((String) currentExmoTrade.get("amount"));
+                    trade.setDate(String.valueOf(currentExmoTrade.get("date")));
+
+                    pairTradeList.add(trade);
+                }
+                tradeMap.put(pair, pairTradeList);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+        return tradeMap;
     }
 
     @Override
@@ -54,7 +91,7 @@ public class publicApiClient implements publicApi {
         try {
             String resultJson = httpClient.getHttp(URL.toString(), null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-            for (Field field :  currencyPair.class.getFields()) {
+            for (Field field : currencyPair.class.getFields()) {
                 currencyPair pair = currencyPair.valueOf(field.getName());
                 Map<String, Object> currentExmoPair = (Map<String, Object>) jsonObject.get(pair.name());
                 exmoOrderBook orderBookPair = new exmoOrderBook();
@@ -69,23 +106,23 @@ public class publicApiClient implements publicApi {
                 orderBookPair.clearAsk();
 
                 JSONArray bids = (JSONArray) currentExmoPair.get("bid");
-                for(int i=0;i<bids.size();i++){
+                for (int i = 0; i < bids.size(); i++) {
                     JSONArray current = (JSONArray) bids.get(i);
                     orderBookPair.addBid(new BigDecimal(String.valueOf(current.get(0))),
                             new BigDecimal(String.valueOf(current.get(1))),
                             new BigDecimal(String.valueOf(current.get(2))));
                 }
                 JSONArray asks = (JSONArray) currentExmoPair.get("ask");
-                for(int i=0;i<asks.size();i++){
+                for (int i = 0; i < asks.size(); i++) {
                     JSONArray current = (JSONArray) asks.get(i);
                     orderBookPair.addAsk(new BigDecimal(String.valueOf(current.get(0))),
                             new BigDecimal(String.valueOf(current.get(1))),
                             new BigDecimal(String.valueOf(current.get(2))));
                 }
-                orderBook.put(pair,orderBookPair);
+                orderBook.put(pair, orderBookPair);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return orderBook;
     }
@@ -113,12 +150,12 @@ public class publicApiClient implements publicApi {
                 ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
                 ticker.setUpdated(updatedTime);
                 listTicker.add(ticker);
-                logger.info("ticker "+ticker.getPair()+": " + ticker);
+                logger.info("ticker " + ticker.getPair() + ": " + ticker);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return listTicker;
     }
@@ -143,10 +180,10 @@ public class publicApiClient implements publicApi {
                 currencyPairSettings.setMin_amount(new BigDecimal(currentExmoPair.get("min_amount")));
                 currencyPairSettings.setMax_amount(new BigDecimal(currentExmoPair.get("max_amount")));
                 pairSettings.put(currentPair, currencyPairSettings);
-                logger.info(currentPair.name() +": "+ currencyPairSettings);
+                logger.info(currentPair.name() + ": " + currencyPairSettings);
             }
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return pairSettings;
     }

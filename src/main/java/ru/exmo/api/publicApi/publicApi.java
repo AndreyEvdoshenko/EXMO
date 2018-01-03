@@ -19,7 +19,7 @@ public interface publicApi {
     /**
      Список сделок по валютной паре
      */
-    List<exmoTrade> returnTrades();
+    Map<currencyPair, List<exmoTrade>> returnTrades();
 
     /**
      Книга ордеров по валютной паре

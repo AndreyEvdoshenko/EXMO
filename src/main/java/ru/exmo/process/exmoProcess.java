@@ -34,6 +34,7 @@ public class exmoProcess {
     public void initProcess(){
         try {
             logger.info("@PostConstruct initProcess() invoke");
+            publicApi.returnTrades();
             publicApi.returnPairSettings();
             publicApi.returnOrderBook(100);
             publicApi.returnTicker();

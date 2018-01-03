@@ -74,7 +74,7 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public Map<currencyPair, exmoOrderBook> returnOrderBook(int limit) throws IOException {
+    public Map<currencyPair, exmoOrderBook> returnOrderBook(int limit) {
 
         logger.info("invoke returnOrderBook()");
         Map<currencyPair, exmoOrderBook> orderBook = new HashMap<>();
@@ -120,6 +120,8 @@ public class publicApiClient implements publicApi {
                 }
                 orderBook.put(pair, orderBookPair);
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
@@ -160,7 +162,7 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public Map<currencyPair, currencyPairSettings> returnPairSettings() throws IOException {
+    public Map<currencyPair, currencyPairSettings> returnPairSettings() {
         logger.info("invoke returnPairSettings()");
         Map<currencyPair, currencyPairSettings> pairSettings = new HashMap<>();
         String URL = publicApiMethods.EXMO_PAIR_SETTINGS.getUrl();
@@ -181,6 +183,8 @@ public class publicApiClient implements publicApi {
                 pairSettings.put(currentPair, currencyPairSettings);
                 logger.info(currentPair.name() + ": " + currencyPairSettings);
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }

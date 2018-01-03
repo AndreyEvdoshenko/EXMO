@@ -20,7 +20,7 @@ public interface publicApi {
      Книга ордеров по валютной паре
      limit - кол-во отображаемых позиций
      */
-    Map<currencyPair, exmoOrderBook> returnOrderBook(int limit) throws IOException;
+    Map<currencyPair, exmoOrderBook> returnOrderBook(int limit);
 
     /**
      Cтатистика цен и объемов торгов по валютным парам
@@ -30,5 +30,5 @@ public interface publicApi {
     /**
      Настройки валютных пар
      */
-    Map<currencyPair,currencyPairSettings> returnPairSettings() throws IOException;
+    Map<currencyPair,currencyPairSettings> returnPairSettings();
 }

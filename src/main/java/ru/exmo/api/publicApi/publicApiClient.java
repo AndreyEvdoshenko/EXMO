@@ -8,7 +8,6 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.*;
-import ru.exmo.process.exmoProcess;
 import ru.exmo.utils.HTTPClient;
 
 import java.io.IOException;
@@ -26,10 +25,10 @@ import java.util.Map;
 @Component
 public class publicApiClient implements publicApi {
 
-    private final Logger logger = Logger.getLogger(exmoProcess.class);
+    private final Logger logger = Logger.getLogger(publicApiClient.class);
 
     @Autowired
-    HTTPClient httpClient;
+    private HTTPClient httpClient;
 
     @Override
     public Map<currencyPair, List<exmoTrade>> returnTrades() {

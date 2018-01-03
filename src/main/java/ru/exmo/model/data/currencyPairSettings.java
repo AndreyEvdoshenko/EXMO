@@ -1,5 +1,7 @@
 package ru.exmo.model.data;
 
+import org.json.simple.JSONObject;
+
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -8,6 +10,7 @@ import java.util.Map;
  */
 public class currencyPairSettings {
 
+    private String pair;
     private BigDecimal min_quantity;    //минимальное кол-во по ордеру
     private BigDecimal max_quantity;    //максимальное кол-во по ордеру
     private BigDecimal min_price;       //минимальная цена по ордеру
@@ -63,4 +66,23 @@ public class currencyPairSettings {
         this.max_amount = max_amount;
     }
 
+    public String getPair() {
+        return pair;
+    }
+
+    public void setPair(String pair) {
+        this.pair = pair;
+    }
+
+    public  String toString(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("min_quantity", min_quantity);
+        jsonObject.put("max_quantity", max_quantity);
+        jsonObject.put("min_price", min_price);
+        jsonObject.put("max_price", max_price);
+        jsonObject.put("min_amount", min_amount);
+        jsonObject.put("max_amount", max_amount);
+        jsonObject.put("pair",pair);
+        return jsonObject.toJSONString();
+    }
 }

@@ -1,11 +1,13 @@
 package ru.exmo.model.data;
 
+import org.json.simple.JSONObject;
+
 /**
  * Created by Андрей on 15.12.2017.
  */
 public class exmoTrade {
 
-    currencyPair pair;
+    private String pair;
     private String trade_id;
     private String type;
     private String price;
@@ -13,14 +15,14 @@ public class exmoTrade {
     private String amount;
     private String date;
 
-    exmoTrade() {
+    public exmoTrade() {
     }
 
-    public currencyPair getPair() {
+    public String getPair() {
         return pair;
     }
 
-    public void setPair(currencyPair pair) {
+    public void setPair(String pair) {
         this.pair = pair;
     }
 
@@ -72,4 +74,9 @@ public class exmoTrade {
         this.date = date;
     }
 
+    public  String toString(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pair",pair);
+        return jsonObject.toJSONString();
+    }
 }

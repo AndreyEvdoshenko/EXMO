@@ -32,18 +32,21 @@ public class publicApiClient implements publicApi {
     HTTPClient httpClient;
 
     @Override
-    public List<exmoTrade> returnTrades(List<currencyPair> pairs) {
+    public List<exmoTrade> returnTrades() {
+        logger.info("invoke returnTrades()");
         return null;
     }
 
     @Override
-    public Map<currencyPair, exmoOrderBook> returnOrderBook(List<currencyPair> pairs, int limit) throws IOException {
+    public Map<currencyPair, exmoOrderBook> returnOrderBook(int limit) throws IOException {
 
+        logger.info("invoke returnOrderBook()");
         Map<currencyPair, exmoOrderBook> orderBook = new HashMap<>();
 
         StringBuilder URL = new StringBuilder(EXMO_ORDER_BOOK_URL);
         URL.append("?pair=");
-        for (currencyPair pair : pairs) {
+        for (Field field : currencyPair.class.getFields()) {
+            currencyPair pair = currencyPair.valueOf(field.getName());
             URL.append(pair.name()).append(",");
         }
         URL.deleteCharAt(URL.length() - 1);
@@ -51,7 +54,8 @@ public class publicApiClient implements publicApi {
         try {
             String resultJson = httpClient.getHttp(URL.toString(), null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-            for (currencyPair pair : pairs) {
+            for (Field field :  currencyPair.class.getFields()) {
+                currencyPair pair = currencyPair.valueOf(field.getName());
                 Map<String, Object> currentExmoPair = (Map<String, Object>) jsonObject.get(pair.name());
                 exmoOrderBook orderBookPair = new exmoOrderBook();
 
@@ -88,6 +92,7 @@ public class publicApiClient implements publicApi {
 
     @Override
     public List<exmoTicker> returnTicker() {
+        logger.info("invoke returnTicker()");
         List<exmoTicker> listTicker = new ArrayList<>();
         try {
             String resultJson = httpClient.getHttp(EXMO_TICKER_URL, null);
@@ -108,10 +113,8 @@ public class publicApiClient implements publicApi {
                 ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
                 ticker.setUpdated(updatedTime);
                 listTicker.add(ticker);
-                logger.info("ticker :" + ticker);
-
+                logger.info("ticker "+ticker.getPair()+": " + ticker);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -122,6 +125,7 @@ public class publicApiClient implements publicApi {
 
     @Override
     public Map<currencyPair, currencyPairSettings> returnPairSettings() throws IOException {
+        logger.info("invoke returnPairSettings()");
         Map<currencyPair, currencyPairSettings> pairSettings = new HashMap<>();
         String URL = EXMO_PAIR_SETTINGS_URL;
         try {
@@ -131,6 +135,7 @@ public class publicApiClient implements publicApi {
                 currencyPair currentPair = currencyPair.valueOf(field.getName());
                 Map<String, String> currentExmoPair = (Map<String, String>) jsonObject.get(currentPair.name());
                 currencyPairSettings currencyPairSettings = new currencyPairSettings();
+                currencyPairSettings.setPair(currentPair.name());
                 currencyPairSettings.setMin_quantity(new BigDecimal(currentExmoPair.get("min_quantity")));
                 currencyPairSettings.setMax_quantity(new BigDecimal(currentExmoPair.get("max_quantity")));
                 currencyPairSettings.setMin_price(new BigDecimal(currentExmoPair.get("min_price")));
@@ -138,6 +143,7 @@ public class publicApiClient implements publicApi {
                 currencyPairSettings.setMin_amount(new BigDecimal(currentExmoPair.get("min_amount")));
                 currencyPairSettings.setMax_amount(new BigDecimal(currentExmoPair.get("max_amount")));
                 pairSettings.put(currentPair, currencyPairSettings);
+                logger.info(currentPair.name() +": "+ currencyPairSettings);
             }
         } catch (ParseException e) {
             e.printStackTrace();

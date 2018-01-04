@@ -1,8 +1,6 @@
 package ru.exmo.api.publicApi;
 
 import ru.exmo.model.data.*;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 

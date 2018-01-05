@@ -9,14 +9,14 @@ import java.util.Map;
 /**
  * Created by Андрей on 03.01.2018.
  */
-public class userInfo {
+public class exmoUserInfo {
 
     private String uid;
     private String server_date;
     private Map<String, BigDecimal> balances;
     private Map<String, BigDecimal> reserved;
 
-    public userInfo() {
+    public exmoUserInfo() {
 
     }
 

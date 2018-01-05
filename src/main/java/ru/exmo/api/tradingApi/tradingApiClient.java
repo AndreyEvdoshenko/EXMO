@@ -7,9 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import ru.exmo.model.data.userInfo;
+import ru.exmo.model.data.exmoUserInfo;
 import ru.exmo.utils.HTTPClient;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -42,9 +40,9 @@ public class tradingApiClient implements tradingApi {
     }
 
     @Override
-    public userInfo returnUserInfo() {
+    public exmoUserInfo returnUserInfo() {
         logger.info("invoke returnUserInfo()");
-        userInfo info = new userInfo();
+        exmoUserInfo info = new exmoUserInfo();
         String resultJson = request(tradingApiMethods.EXMO_USER_INFO, null);
         try {
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);

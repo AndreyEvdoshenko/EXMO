@@ -8,6 +8,16 @@ import ru.exmo.model.data.userInfo;
 public interface tradingApi {
 
     /**
+     Ключ EXMO
+     */
+    void setKey(String _key);
+
+    /**
+     Ключ EXMO
+     */
+    void setSecret(String _secret);
+
+    /**
      Запрос информации о пользователе
      */
     userInfo returnUserInfo();

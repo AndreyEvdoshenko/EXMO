@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.userInfo;
 import ru.exmo.utils.HTTPClient;
@@ -21,13 +22,13 @@ import java.util.*;
 /**
  * Created by Андрей on 03.01.2018.
  */
-@Component
+
 public class tradingApiClient implements tradingApi {
 
     private final Logger logger = Logger.getLogger(tradingApiClient.class);
 
-    private final String _key = "";
-    private final String _secret = "";
+    private  String _key;
+    private  String _secret;
 
     private static long _nonce;
 
@@ -46,7 +47,7 @@ public class tradingApiClient implements tradingApi {
         String resultJson = request(tradingApiMethods.EXMO_USER_INFO, null);
         try {
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-
+            logger.info(jsonObject);
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
@@ -124,6 +125,17 @@ public class tradingApiClient implements tradingApi {
 
         return null;
     }
+
+    @Override
+    public void setKey(String _key) {
+        this._key = _key;
+    }
+
+    @Override
+    public void setSecret(String _secret) {
+        this._secret = _secret;
+    }
+
 
     private class pair implements NameValuePair {
         private String name;

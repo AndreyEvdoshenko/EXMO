@@ -15,6 +15,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -47,7 +48,11 @@ public class tradingApiClient implements tradingApi {
         String resultJson = request(tradingApiMethods.EXMO_USER_INFO, null);
         try {
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-            logger.info(jsonObject);
+            info.setUid(String.valueOf(jsonObject.get("uid")));
+            info.setServer_date(String.valueOf(jsonObject.get("server_date")));
+            info.setBalances((Map<String, BigDecimal>) jsonObject.get("balances"));
+            info.setReserved((Map<String, BigDecimal>) jsonObject.get("reserved"));
+            logger.info("userInfo: "+info);
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }

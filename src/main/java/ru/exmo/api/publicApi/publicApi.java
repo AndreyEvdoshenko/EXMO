@@ -23,7 +23,7 @@ public interface publicApi {
     /**
      Cтатистика цен и объемов торгов по валютным парам
      */
-    List<exmoTicker> returnTicker();
+    Map<String, exmoTicker> returnTicker();
 
     /**
      Настройки валютных пар

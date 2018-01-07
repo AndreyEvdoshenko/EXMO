@@ -129,9 +129,9 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public List<exmoTicker> returnTicker() {
-        logger.info("invoke returnTicker()");
-        List<exmoTicker> listTicker = new ArrayList<>();
+    public Map<String, exmoTicker> returnTicker() {
+      //  logger.info("invoke returnTicker()");
+        Map<String,exmoTicker> listTicker = new HashMap<>();
         try {
             String resultJson = httpClient.getHttp(publicApiMethods.EXMO_TICKER.getUrl(), null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
@@ -146,15 +146,17 @@ public class publicApiClient implements publicApi {
                 ticker.setAvg(new BigDecimal(String.valueOf(currentExmoPair.get("avg"))));
                 ticker.setVol(new BigDecimal(String.valueOf(currentExmoPair.get("vol"))));
                 ticker.setVol_curr(new BigDecimal(String.valueOf(currentExmoPair.get("vol_curr"))));
-                ticker.setLast_trade(new BigDecimal(String.valueOf(currentExmoPair.get("last_trade"))));
+                //ticker.setLast_trade(new BigDecimal(String.valueOf(currentExmoPair.get("last_trade"))));
+                ticker.setLast_trade(Float.valueOf(String.valueOf(currentExmoPair.get("last_trade"))));
                 ticker.setBuy_price(new BigDecimal(String.valueOf(currentExmoPair.get("buy_price"))));
+                //ticker.setBuy_price(Double.valueOf(String.valueOf(currentExmoPair.get("buy_price"))));
                 ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
                 ticker.setUpdated(updatedTime);
-                listTicker.add(ticker);
-                logger.info("ticker " + ticker.getPair() + ": " + ticker);
+                listTicker.put(currentPair.name(),ticker);
+             //   logger.info("ticker " + ticker.getPair() + ": " + ticker);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }

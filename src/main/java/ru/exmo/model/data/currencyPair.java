@@ -7,5 +7,6 @@ import java.math.BigDecimal;
  */
 public enum  currencyPair {
     LTC_USD,
-    LTC_RUB
+    LTC_RUB,
+    XRP_RUB
 }

@@ -10,5 +10,5 @@ import java.util.Map;
  * Created by Andrash on 07.01.2018.
  */
 public interface tradingDAO {
-    List<Map<String, Object>> dataOverPeriodOfTime(Timestamp startTime, Timestamp endTime, List<currencyPair> pairs);
+    Map<String, List<Float>> dataOverPeriodOfTime(Timestamp startTime, Timestamp endTime, List<currencyPair> pairs);
 }

@@ -20,6 +20,7 @@ public class exmoTicker {
     private BigDecimal buy_price; //  текущая максимальная цена покупки
     private BigDecimal sell_price; // текущая минимальная цена продажи
     private Timestamp updated; //  дата и время обновления данных
+    private float mediumValue; // среднее значение
 
     public exmoTicker() {
 
@@ -103,6 +104,14 @@ public class exmoTicker {
 
     public void setPair(String pair) {
         this.pair = pair;
+    }
+
+    public float getMediumValue() {
+        return mediumValue;
+    }
+
+    public void setMediumValue(float mediumValue) {
+        this.mediumValue = mediumValue;
     }
 
     public  String toString(){

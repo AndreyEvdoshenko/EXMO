@@ -28,5 +28,5 @@ public interface publicApi {
     /**
      Настройки валютных пар
      */
-    Map<currencyPair,currencyPairSettings> returnPairSettings();
+    void loadPairSettings();
 }

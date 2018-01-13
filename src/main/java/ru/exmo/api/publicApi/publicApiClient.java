@@ -164,9 +164,8 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public Map<currencyPair, currencyPairSettings> returnPairSettings() {
-        logger.info("invoke returnPairSettings()");
-        Map<currencyPair, currencyPairSettings> pairSettings = new HashMap<>();
+    public void loadPairSettings() {
+        logger.info("invoke loadPairSettings()");
         String URL = publicApiMethods.EXMO_PAIR_SETTINGS.getUrl();
         try {
             String resultJson = httpClient.getHttp(URL, null);
@@ -174,23 +173,20 @@ public class publicApiClient implements publicApi {
             for (Field field : currencyPair.class.getFields()) {
                 currencyPair currentPair = currencyPair.valueOf(field.getName());
                 Map<String, String> currentExmoPair = (Map<String, String>) jsonObject.get(currentPair.name());
-                currencyPairSettings currencyPairSettings = new currencyPairSettings();
-                currencyPairSettings.setPair(currentPair.name());
-                currencyPairSettings.setMin_quantity(new BigDecimal(currentExmoPair.get("min_quantity")));
-                currencyPairSettings.setMax_quantity(new BigDecimal(currentExmoPair.get("max_quantity")));
-                currencyPairSettings.setMin_price(new BigDecimal(currentExmoPair.get("min_price")));
-                currencyPairSettings.setMax_price(new BigDecimal(currentExmoPair.get("max_price")));
-                currencyPairSettings.setMin_amount(new BigDecimal(currentExmoPair.get("min_amount")));
-                currencyPairSettings.setMax_amount(new BigDecimal(currentExmoPair.get("max_amount")));
-                pairSettings.put(currentPair, currencyPairSettings);
-                logger.info(currentPair.name() + ": " + currencyPairSettings);
+                currentPair.setPair(currentPair.name());
+                currentPair.setMin_quantity(Float.valueOf(currentExmoPair.get("min_quantity")));
+                currentPair.setMax_quantity(Float.valueOf(currentExmoPair.get("max_quantity")));
+                currentPair.setMin_price(Float.valueOf(currentExmoPair.get("min_price")));
+                currentPair.setMax_price(Float.valueOf(currentExmoPair.get("max_price")));
+                currentPair.setMin_amount(Float.valueOf(currentExmoPair.get("min_amount")));
+                currentPair.setMax_amount(Float.valueOf(currentExmoPair.get("max_amount")));
+                logger.info(currentPair.name() + ": " + currentPair);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
-        return pairSettings;
     }
 
 }

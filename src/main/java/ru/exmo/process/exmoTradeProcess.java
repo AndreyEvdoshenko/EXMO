@@ -51,10 +51,12 @@ public class exmoTradeProcess {
 
     public void sell(currencyPair pair) {
         exmoUserInfo user = tradingApi.returnUserInfo();
-        pair.setBuy(false);
+        pair.setBuy(false);//sellOrder.setQuantity(Float.valueOf(String.valueOf(user.getBalances().get(pair.getName1()))))
         exmoOrderCreate sellOrder = new exmoOrderCreate();
         sellOrder.setPair(pair.getName());
-        sellOrder.setQuantity(user.getBalances().get(pair.getName1())); // продавать все что есть
+        String str = String.valueOf(user.getBalances().get(pair.getName1()));
+        Float amount = Float.valueOf(str);
+        sellOrder.setQuantity(amount); // продавать все что есть
         sellOrder.setType(exmoTypeOrder.sell);
         sellOrder.setPrice(pair.getSellValues());
       //  sellOrder.setPrice(0);

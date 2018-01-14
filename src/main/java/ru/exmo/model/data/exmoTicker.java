@@ -17,8 +17,8 @@ public class exmoTicker {
     private BigDecimal vol; //  объем всех сделок за 24 часа
     private BigDecimal vol_curr; //  сумма всех сделок за 24 часа
     private float last_trade; //  цена последней сделки
-    private BigDecimal buy_price; //  текущая максимальная цена покупки
-    private BigDecimal sell_price; // текущая минимальная цена продажи
+    private float buy_price; //  текущая максимальная цена покупки
+    private float sell_price; // текущая минимальная цена продажи
     private Timestamp updated; //  дата и время обновления данных
     private float mediumValue; // среднее значение
 
@@ -74,19 +74,19 @@ public class exmoTicker {
         this.last_trade = last_trade;
     }
 
-    public BigDecimal getBuy_price() {
+    public float getBuy_price() {
         return buy_price;
     }
 
-    public void setBuy_price(BigDecimal buy_price) {
+    public void setBuy_price(float buy_price) {
         this.buy_price = buy_price;
     }
 
-    public BigDecimal getSell_price() {
+    public float getSell_price() {
         return sell_price;
     }
 
-    public void setSell_price(BigDecimal sell_price) {
+    public void setSell_price(float sell_price) {
         this.sell_price = sell_price;
     }
 

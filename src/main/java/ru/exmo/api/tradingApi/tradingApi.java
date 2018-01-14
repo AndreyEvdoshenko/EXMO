@@ -1,5 +1,6 @@
 package ru.exmo.api.tradingApi;
 
+import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
 
 /**
@@ -21,4 +22,10 @@ public interface tradingApi {
      Запрос информации о пользователе
      */
     exmoUserInfo returnUserInfo();
+
+    /**
+     Созание ордера
+     */
+    exmoOrderCreate createOrder(exmoOrderCreate order);
+
 }

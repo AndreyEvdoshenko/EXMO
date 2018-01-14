@@ -5,7 +5,8 @@ package ru.exmo.api.tradingApi;
  */
 public enum tradingApiMethods {
 
-    EXMO_USER_INFO("https://api.exmo.com/v1/user_info");
+    EXMO_USER_INFO("https://api.exmo.com/v1/user_info"),
+    EXMO_ORDER_CREAT("https://api.exmo.com/v1/order_create");
 
     tradingApiMethods(String url){
         this.url = url;

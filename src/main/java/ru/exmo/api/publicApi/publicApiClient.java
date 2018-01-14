@@ -148,12 +148,13 @@ public class publicApiClient implements publicApi {
                 ticker.setVol_curr(new BigDecimal(String.valueOf(currentExmoPair.get("vol_curr"))));
                 //ticker.setLast_trade(new BigDecimal(String.valueOf(currentExmoPair.get("last_trade"))));
                 ticker.setLast_trade(Float.valueOf(String.valueOf(currentExmoPair.get("last_trade"))));
-                ticker.setBuy_price(new BigDecimal(String.valueOf(currentExmoPair.get("buy_price"))));
-                //ticker.setBuy_price(Double.valueOf(String.valueOf(currentExmoPair.get("buy_price"))));
-                ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
+                //ticker.setBuy_price(new BigDecimal(String.valueOf(currentExmoPair.get("buy_price"))));
+                ticker.setBuy_price(Float.valueOf(String.valueOf(currentExmoPair.get("buy_price"))));
+             //   ticker.setSell_price(new BigDecimal(String.valueOf(currentExmoPair.get("sell_price"))));
+                ticker.setSell_price(Float.valueOf(String.valueOf(currentExmoPair.get("sell_price"))));
                 ticker.setUpdated(updatedTime);
                 listTicker.put(currentPair.name(),ticker);
-             //   logger.info("ticker " + ticker.getPair() + ": " + ticker);
+                //logger.info("ticker " + ticker.getPair() + ": " + ticker);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -170,8 +171,7 @@ public class publicApiClient implements publicApi {
         try {
             String resultJson = httpClient.getHttp(URL, null);
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-            for (Field field : currencyPair.class.getFields()) {
-                currencyPair currentPair = currencyPair.valueOf(field.getName());
+            for (currencyPair currentPair : currencyPair.values()) {
                 Map<String, String> currentExmoPair = (Map<String, String>) jsonObject.get(currentPair.name());
                 currentPair.setPair(currentPair.name());
                 currentPair.setMin_quantity(Float.valueOf(currentExmoPair.get("min_quantity")));

@@ -10,10 +10,12 @@ import ru.exmo.api.tradingApi.tradingApi;
 import ru.exmo.api.publicApi.publicApi;
 import ru.exmo.dao.tradingDAO;
 import ru.exmo.model.data.currencyPair;
+import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoTicker;
+import ru.exmo.model.data.exmoTypeOrder;
+import ru.exmo.model.data.stub.stubUser;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.Field;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -25,6 +27,7 @@ import java.util.*;
 @EnableScheduling
 public class exmoProcess {
     private final Logger logger = Logger.getLogger(exmoProcess.class);
+
 
     @Autowired
     private publicApi publicApi;
@@ -48,16 +51,15 @@ public class exmoProcess {
     @PostConstruct
     public void initProcess() {
         logger.info("@PostConstruct initProcess() invoke");
-
-//        tradePairList.add(new exmoTradeProcess(currencyPair.LTC_RUB));
-//        tradePairList.add(new exmoTradeProcess());
-
-//            publicApi.returnTrades()
-//            publicApi.returnPairSettings();
-//            publicApi.returnOrderBook(100);
-//            publicApi.returnTicker();
-//            tradingApi.returnUserInfo();
-
+        updateCurrnecPair();
+        evaluateMedium();
+        tradingApi.returnUserInfo();
+//        exmoOrderCreate order = new exmoOrderCreate();
+//        order.setPair(currencyPair.BTC_USD.getName());
+//        order.setQuantity(0.001996F);
+//        order.setType(exmoTypeOrder.market_sell);
+//        order.setPrice(0);
+//        tradingApi.createOrder(order);
     }
 
     @Scheduled(fixedRate = 600000)
@@ -67,9 +69,7 @@ public class exmoProcess {
         synchronized (exmoProcess.class) {
             Map<String, List<Float>> tradeHistory = dao.dataOverPeriodOfTime(new Timestamp(System.currentTimeMillis() - interval),
                     new Timestamp(System.currentTimeMillis()),
-                    Arrays.asList(currencyPair.LTC_RUB, currencyPair.LTC_USD));
-                  //  Arrays.asList(currencyPair.LTC_RUB));
-
+                    Arrays.asList(currencyPair.BTC_USD));
             for (Map.Entry entry : tradeHistory.entrySet()) {
                 String pair = (String) entry.getKey();
                 currencyPair currentPair = currencyPair.valueOf(pair);
@@ -94,15 +94,19 @@ public class exmoProcess {
 
     private synchronized void analise() {
         for (currencyPair pair : currencyPair.values()) {
-            if (!pair.isBuy()) {
-                boolean buy = buyAnalise(pair);
-                if (buy) {
-                    exmoTradeProcess.buy(pair);
-                }
-            } else {
-                boolean sell = sellAnalise(pair);
-                if (sell) {
-                    exmoTradeProcess.sell(pair);
+            if (pair.isActive()) {
+                if (!pair.isBuy()) {
+                    boolean buy = buyAnalise(pair);
+                    if (buy) {
+                        logger.info("ticker " + ticker.get(pair.name()) + ": " + ticker);
+                        exmoTradeProcess.buy(pair);
+                    }
+                } else {
+                    boolean sell = sellAnalise(pair);
+                    if (sell) {
+                        logger.info("ticker " + ticker.get(pair.name()) + ": " + ticker);
+                        exmoTradeProcess.sell(pair);
+                    }
                 }
             }
         }
@@ -110,7 +114,7 @@ public class exmoProcess {
 
 
     private boolean buyAnalise(currencyPair pair) {
-        float currentValue = ticker.get(pair.name()).getLast_trade();
+        float currentValue = ticker.get(pair.name()).getSell_price();
         float mediumValue = pair.getMediumValues();
         double percentageOfExclusionBuy = pair.getPercentageOfExclusionBuy();
         double deviation;
@@ -118,6 +122,7 @@ public class exmoProcess {
             deviation = 100 - ((currentValue * 100) / mediumValue);
             logger.info(pair.getName() + " цена упала: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: -" + deviation);
             if (deviation > percentageOfExclusionBuy) {
+                pair.setExclusion_medium((float) deviation);
                 pair.setBuyValues(currentValue);
                 logger.info(pair.getName() + " выставляем ордер на покупку по цене  " + currentValue);
                 return true;
@@ -132,23 +137,39 @@ public class exmoProcess {
     }
 
     private boolean sellAnalise(currencyPair pair) {
-        float currentValue = ticker.get(pair.name()).getLast_trade();
+        float currentValue = ticker.get(pair.name()).getBuy_price();
         float buyValue = pair.getBuyValues();
-        float percentageOfExclusionSell = pair.getPercentageOfExclusionSell();
+        float percentageOfExclusionSell = (float) pair.getPercentageOfExclusionSell();
+        float getPercentageOfNoReturn = (float) pair.getPercentageOfNoReturn();
         if (buyValue - currentValue > 0) {
             double deviation = 100 - ((currentValue * 100) / buyValue);
             logger.info(pair.getName() + " цена упала от закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
+            if (deviation > getPercentageOfNoReturn) {
+                pair.setExclusion_buy((float) deviation);
+                pair.setSellValues(currentValue);
+                pair.setSellProfit(false);
+                logger.info(pair.getName() + " выставляем ордер на продажу по цене, выходим в минус" + buyValue);
+                return true;
+            }
         } else if (buyValue - currentValue < 0) {
             double deviation = ((currentValue * 100) / buyValue) - 100;
             logger.info(pair.getName() + " цена поднялась от закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
             if (deviation > percentageOfExclusionSell) {
-                logger.info(pair.getName() + " выставляем ордер на продажу по цене " + buyValue);
+                pair.setExclusion_buy((float) deviation);
+                pair.setSellValues(currentValue);
+                pair.setSellProfit(true);
+                logger.info(pair.getName() + " выставляем ордер на продажу по цене, выходим в плюс " + buyValue);
                 return true;
             }
         } else {
             logger.info(pair.getName() + " цена не изменилась от закупки: " + buyValue + ", текущаяя: " + currentValue);
         }
         return false;
+    }
+
+    private void updateCurrnecPair() {
+        publicApi.loadPairSettings();
+        dao.initCurrencyPairSettings();
     }
 
 

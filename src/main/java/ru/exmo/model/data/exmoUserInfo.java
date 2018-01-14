@@ -13,8 +13,8 @@ public class exmoUserInfo {
 
     private String uid;
     private String server_date;
-    private Map<String, BigDecimal> balances;
-    private Map<String, BigDecimal> reserved;
+    private Map<String, Float> balances;
+    private Map<String, Float> reserved;
 
     public exmoUserInfo() {
 
@@ -36,19 +36,19 @@ public class exmoUserInfo {
         this.server_date = server_date;
     }
 
-    public Map<String, BigDecimal> getBalances() {
+    public Map<String, Float> getBalances() {
         return balances;
     }
 
-    public void setBalances(Map<String, BigDecimal> balances) {
+    public void setBalances(Map<String, Float> balances) {
         this.balances = balances;
     }
 
-    public Map<String, BigDecimal> getReserved() {
+    public Map<String, Float> getReserved() {
         return reserved;
     }
 
-    public void setReserved(Map<String, BigDecimal> reserved) {
+    public void setReserved(Map<String, Float> reserved) {
         this.reserved = reserved;
     }
 

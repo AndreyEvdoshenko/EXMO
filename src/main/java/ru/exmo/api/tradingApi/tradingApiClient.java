@@ -7,8 +7,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
 import ru.exmo.utils.HTTPClient;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
@@ -26,8 +28,8 @@ public class tradingApiClient implements tradingApi {
 
     private final Logger logger = Logger.getLogger(tradingApiClient.class);
 
-    private  String _key;
-    private  String _secret;
+    private String _key;
+    private String _secret;
 
     private static long _nonce;
 
@@ -48,13 +50,36 @@ public class tradingApiClient implements tradingApi {
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
             info.setUid(String.valueOf(jsonObject.get("uid")));
             info.setServer_date(String.valueOf(jsonObject.get("server_date")));
-            info.setBalances((Map<String, BigDecimal>) jsonObject.get("balances"));
-            info.setReserved((Map<String, BigDecimal>) jsonObject.get("reserved"));
-            logger.info("userInfo: "+info);
+            info.setBalances((Map<String, Float>) jsonObject.get("balances"));
+            info.setReserved((Map<String, Float>) jsonObject.get("reserved"));
+            logger.info("userInfo: " + info);
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
         return info;
+    }
+
+    @Override
+    public exmoOrderCreate createOrder(exmoOrderCreate order) {
+        logger.info("invoke createOrder()");
+
+        Map<String, String> params = new HashMap<>();
+        params.put("pair", order.getPair());
+        params.put("quantity", String.valueOf(order.getQuantity()));
+        params.put("price", String.valueOf(order.getPrice()));
+        params.put("type", order.getType());
+
+        String resultJson = request(tradingApiMethods.EXMO_ORDER_CREAT, params);
+        try {
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+            order.setResult(String.valueOf(jsonObject.get("result")));
+            order.setError((String) jsonObject.get("error"));
+            order.setOrder_id(String.valueOf(jsonObject.get("order_id")));
+            logger.info(order);
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+        return order;
     }
 
 

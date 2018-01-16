@@ -43,9 +43,9 @@ public enum  currencyPair {
     private float exclusion_medium;          // отклонение от среднего на момент покупки
     private float exclusion_buy;             // отклонение от закупочной цены на момент продажи
 
-    private double percentageOfExclusionBuy;    //процент отклонения для покупки (от среднего)
-    private double percentageOfExclusionSell;   //процент отклонения для продажи(от запучной цены)
-    private double percentageOfNoReturn;        //процент не возврата от закуп цены
+    private float percentageOfExclusionBuy;    //процент отклонения для покупки (от среднего)
+    private float percentageOfExclusionSell;   //процент отклонения для продажи(от запучной цены)
+    private float percentageOfNoReturn;        //процент не возврата от закуп цены
 
 
     public boolean isSellProfit() {
@@ -56,11 +56,11 @@ public enum  currencyPair {
         this.sellProfit = sellProfit;
     }
 
-    public double getPercentageOfNoReturn() {
+    public float getPercentageOfNoReturn() {
         return percentageOfNoReturn;
     }
 
-    public void setPercentageOfNoReturn(double percentageOfNoReturn) {
+    public void setPercentageOfNoReturn(float percentageOfNoReturn) {
         this.percentageOfNoReturn = percentageOfNoReturn;
     }
 
@@ -72,19 +72,19 @@ public enum  currencyPair {
         this.active = active;
     }
 
-    public double getPercentageOfExclusionBuy() {
+    public float getPercentageOfExclusionBuy() {
         return percentageOfExclusionBuy;
     }
 
-    public void setPercentageOfExclusionBuy(double percentageOfExclusionBuy) {
+    public void setPercentageOfExclusionBuy(float percentageOfExclusionBuy) {
         this.percentageOfExclusionBuy = percentageOfExclusionBuy;
     }
 
-    public double getPercentageOfExclusionSell() {
+    public float getPercentageOfExclusionSell() {
         return percentageOfExclusionSell;
     }
 
-    public void setPercentageOfExclusionSell(double percentageOfExclusionSell) {
+    public void setPercentageOfExclusionSell(float percentageOfExclusionSell) {
         this.percentageOfExclusionSell = percentageOfExclusionSell;
     }
 

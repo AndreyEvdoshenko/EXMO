@@ -89,9 +89,9 @@ public class tradingClientDAO implements tradingDAO {
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,params);
         for (int i = 0; i < list.size(); i++) {
             currencyPair currentPair = currencyPair.valueOf((String)list.get(i).get("pair"));
-            currentPair.setPercentageOfExclusionBuy(Double.valueOf((String) list.get(i).get("percentageofexclusionbuy")));
-            currentPair.setPercentageOfExclusionSell(Double.valueOf((String) list.get(i).get("percentageofexclusionsell")));
-            currentPair.setPercentageOfNoReturn(Double.valueOf((String) list.get(i).get("percentageofnoreturn")));
+            currentPair.setPercentageOfExclusionBuy(Float.valueOf((String) list.get(i).get("percentageofexclusionbuy")));
+            currentPair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(i).get("percentageofexclusionsell")));
+            currentPair.setPercentageOfNoReturn(Float.valueOf((String) list.get(i).get("percentageofnoreturn")));
             currentPair.setActive(Boolean.valueOf((String) list.get(i).get("active")));
             }
     }

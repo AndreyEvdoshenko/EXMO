@@ -3,10 +3,12 @@ package ru.exmo.api.tradingApi;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import ru.exmo.model.data.currencyPair;
 import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
 import ru.exmo.model.data.exmoUserOpenOrders;
@@ -84,23 +86,34 @@ public class tradingApiClient implements tradingApi {
     }
 
     @Override
-    public exmoUserOpenOrders returnUserOpenOrders() {
-
+    public Map<String,List<exmoUserOpenOrders>>  returnUserOpenOrders() {
+        Map<String,List<exmoUserOpenOrders>> orders = new HashMap<>();
         String resultJson = request(tradingApiMethods.EXMO_USER_OPEN_ORDERS, null);
         try {
             JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
-//            order.setResult(String.valueOf(jsonObject.get("result")));
-//            order.setError((String) jsonObject.get("error"));
-//            order.setOrder_id(String.valueOf(jsonObject.get("order_id")));
-//            logger.info(order);
-            int a = 0;
-            a++;
+            for(currencyPair currentPair : currencyPair.values()){
+                JSONArray orderPairList = (JSONArray) jsonObject.get(currentPair.name());
+                if(orderPairList != null){
+                    List<exmoUserOpenOrders> orderList = new ArrayList<>();
+                    for(int i=0;i<orderPairList.size();i++){
+                        Map<String, Object> orderPair = (Map<String, Object>) orderPairList.get(i);
+                        exmoUserOpenOrders order = new exmoUserOpenOrders();
+                        order.setAmount(Float.valueOf(String.valueOf(orderPair.get("amount"))));
+                        order.setQuantity(Float.valueOf(String.valueOf(orderPair.get("quantity"))));
+                        order.setCreated((String) orderPair.get("created"));
+                        order.setPrice(Float.valueOf(String.valueOf(orderPair.get("price"))));
+                        order.setType((String) orderPair.get("type"));
+                        order.setOrder_id(Integer.valueOf(String.valueOf(orderPair.get("order_id"))));
+                        order.setPair(currentPair);
+                        orderList.add(order);
+                    }
+                    orders.put(currentPair.name(),orderList);
+                }
+            }
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }
-
-
-        return null;
+        return orders;
     }
 
 

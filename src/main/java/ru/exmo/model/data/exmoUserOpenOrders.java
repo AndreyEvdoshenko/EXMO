@@ -5,10 +5,10 @@ package ru.exmo.model.data;
  */
 public class exmoUserOpenOrders {
 
-    private float order_id;          // идентификатор ордера
-    private float  created;          // дата и время создания ордера
-    private float  type;             // тип ордера
-    private float   pair;            // валютная пара
+    private int order_id;          // идентификатор ордера
+    private String  created;          // дата и время создания ордера
+    private String  type;             // тип ордера
+    private currencyPair   pair;            // валютная пара
     private float   price;           // цена по ордеру
     private float   quantity;        // кол-во по ордеру
     private float   amount;          // сумма по ордеру
@@ -17,35 +17,35 @@ public class exmoUserOpenOrders {
 
     }
 
-    public float getOrder_id() {
+    public int getOrder_id() {
         return order_id;
     }
 
-    public void setOrder_id(float order_id) {
+    public void setOrder_id(int order_id) {
         this.order_id = order_id;
     }
 
-    public float getCreated() {
+    public String getCreated() {
         return created;
     }
 
-    public void setCreated(float created) {
+    public void setCreated(String created) {
         this.created = created;
     }
 
-    public float getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(float type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public float getPair() {
+    public currencyPair getPair() {
         return pair;
     }
 
-    public void setPair(float pair) {
+    public void setPair(currencyPair pair) {
         this.pair = pair;
     }
 

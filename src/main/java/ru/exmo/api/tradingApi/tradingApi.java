@@ -4,6 +4,9 @@ import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
 import ru.exmo.model.data.exmoUserOpenOrders;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Andrash on 17.12.2017.
  */
@@ -32,7 +35,7 @@ public interface tradingApi {
     /**
      Список открытых ордеров ордера
      */
-    exmoUserOpenOrders returnUserOpenOrders();
+   Map<String,List<exmoUserOpenOrders>> returnUserOpenOrders();
 
 
 }

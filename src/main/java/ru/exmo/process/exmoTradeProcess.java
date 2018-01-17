@@ -40,23 +40,7 @@ public class exmoTradeProcess {
 
     public void buy(currencyPair pair) {
 
-        exmoOrderCreate buyOrder = new exmoOrderCreate();
-        buyOrder.setPair(pair.getName());
-        buyOrder.setQuantity(pair.getMin_quantity() * 2);
-        buyOrder.setType(exmoTypeOrder.buy);
-        buyOrder.setPrice(pair.getBuyValues());
-        //buyOrder.setPrice(0);
-        buyOrder.setMedium_price(pair.getMediumValues());
-        buyOrder.setExclusion_medium(pair.getExclusion_medium());
-        buyOrder.setExclusion_buy(0);
-        buyOrder = tradingApi.createOrder(buyOrder);
-        if ("true".equals(buyOrder.getResult())) {
-            pair.setBuy(true);
-            dao.createOrder(buyOrder);
-            logger.info("Ордер на покупку " + pair.name() + " выставлен");
-        } else {
-            logger.error("Ордер на покупку " + pair.name() + " не получилось, причина " + buyOrder.getError());
-        }
+
     }
 
     public void sell(currencyPair pair) {
@@ -92,37 +76,36 @@ public class exmoTradeProcess {
 
         private volatile exmoTicker ticker;
 
-        private String name;
-        private String name1;
-        private String name2;
-
-        private float mediumValues;         //среднее значение за интервал времени
-        private float buyValues;            //цена по коротой купили
-        private float sellValues;           //цена по коротой продали
-        private boolean isBuy = false;        //куплено?
-
-        private float exclusion_medium;          // отклонение от среднего на момент покупки
-        private float exclusion_buy;             // отклонение от закупочной цены на момент продажи
-
-        private float percentageOfExclusionBuy;    //процент отклонения для покупки (от среднего)
-        private float percentageOfExclusionSell;   //процент отклонения для продажи(от запучной цены)
-        private float percentageOfNoReturn;        //процент не возврата от закуп цены
-
         tradePair(currencyPair pair) {
             this.pair = pair;
-            this.name1 = pair.getName().substring(0, 3);
-            this.name2 = pair.getName().substring(4, 7);
         }
 
         void createSellOrder() {
 
         }
 
-        void createBuyOrder() {
-
+        private boolean createBuyOrder(float buyPrice) {
+            exmoOrderCreate buyOrder = new exmoOrderCreate();
+            buyOrder.setPair(pair.getName());
+            buyOrder.setQuantity(pair.getMin_quantity() * 2);
+            buyOrder.setType(exmoTypeOrder.buy);
+            buyOrder.setPrice(buyPrice);
+            //buyOrder.setPrice(0);
+            buyOrder.setMedium_price(pair.getMediumValues());
+            buyOrder.setExclusion_medium(pair.getExclusion_medium());
+            buyOrder.setExclusion_buy(0);
+            buyOrder = tradingApi.createOrder(buyOrder);
+            if ("true".equals(buyOrder.getResult())) {
+                dao.createOrder(buyOrder);
+                logger.info("Ордер на покупку " + pair.name() + " выставлен");
+                return true;
+            } else {
+                logger.error("Ордер на покупку " + pair.name() + " не получилось, причина " + buyOrder.getError());
+                return false;
+            }
         }
 
-        private boolean buyAnalise() {
+        private void buy() {
             float currentValue = ticker.getSell_price();
             float mediumValue = pair.getMediumValues();
             float percentageOfExclusionBuy = pair.getPercentageOfExclusionBuy();
@@ -131,10 +114,15 @@ public class exmoTradeProcess {
                 deviation = 100 - ((currentValue * 100) / mediumValue);
                 logger.info(pair.getName() + " цена упала: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: -" + deviation);
                 if (deviation > percentageOfExclusionBuy) {
-                    pair.setExclusion_medium(deviation);
-                    pair.setBuyValues(currentValue);
                     logger.info(pair.getName() + " выставляем ордер на покупку по цене  " + currentValue);
-                    return true;
+                    logger.info("ticker " + pair.getName() + ": " + ticker);
+                    boolean isBuy = createBuyOrder(currentValue);
+                    if(isBuy){
+                        pair.setBuy(true);
+                        pair.setExclusion_medium(deviation);
+                        pair.setBuyValues(currentValue);
+                        pair.setSellValues(currentValue+(currentValue/100*pair.getPercentageOfExclusionSell()));
+                    }
                 }
             } else if (mediumValue - currentValue < 0) {
                 deviation = ((currentValue * 100) / mediumValue) - 100;
@@ -142,7 +130,6 @@ public class exmoTradeProcess {
             } else {
                 logger.info(pair.getName() + " цена за 5 минут не изменилась от средней: " + mediumValue + ", текущаяя: " + currentValue);
             }
-            return false;
         }
 
         @Override
@@ -155,11 +142,7 @@ public class exmoTradeProcess {
                 }
                 ticker = tickerProcess.returnTicker(pair);
                 if (!pair.isBuy()) {
-                    boolean buy = buyAnalise();
-                    if (buy) {
-                        logger.info("ticker " + pair.getName() + ": " + ticker);
-                        createBuyOrder();
-                    }
+                   buy();
                 } else {
 //                boolean sell = sellAnalise();
 //                if (sell) {

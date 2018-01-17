@@ -35,10 +35,9 @@ public enum  currencyPair {
 
     private float      mediumValues;         //среднее значение за интервал времени
     private float      buyValues;            //цена по коротой купили
-    private float      sellValues;           //цена по коротой продали
+    private float      sellValues;           //цена по коротой надо продавать
     private boolean    isBuy = false;        //куплено?
     private boolean    sellProfit;             //Продано в плюс?
-
 
     private float exclusion_medium;          // отклонение от среднего на момент покупки
     private float exclusion_buy;             // отклонение от закупочной цены на момент продажи

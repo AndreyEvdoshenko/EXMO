@@ -64,7 +64,8 @@ public class tradingApiClient implements tradingApi {
 
     @Override
     public exmoOrderCreate createOrder(exmoOrderCreate order) {
-        logger.info("invoke createOrder()");
+        logger.info("invoke createOrder for pair "+order.getPair());
+        logger.info("order: "+order);
 
         Map<String, String> params = new HashMap<>();
         params.put("pair", order.getPair());

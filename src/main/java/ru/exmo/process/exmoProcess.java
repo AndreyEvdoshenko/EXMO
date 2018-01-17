@@ -48,8 +48,8 @@ public class exmoProcess {
     @PostConstruct
     public void initProcess() {
         logger.info("@PostConstruct initProcess() invoke");
-       // updateCurrnecPair();
-        tradingApi.returnUserOpenOrders();
+        updateCurrnecPair();
+        //tradingApi.returnUserOpenOrders();
 //        tradingApi.returnUserInfo();
 //        exmoOrderCreate order = new exmoOrderCreate();
 //        order.setPair(currencyPair.BTC_USD.getName());

@@ -2,6 +2,7 @@ package ru.exmo.api.tradingApi;
 
 import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
+import ru.exmo.model.data.exmoUserOpenOrders;
 
 /**
  * Created by Andrash on 17.12.2017.
@@ -27,5 +28,11 @@ public interface tradingApi {
      Созание ордера
      */
     exmoOrderCreate createOrder(exmoOrderCreate order);
+
+    /**
+     Список открытых ордеров ордера
+     */
+    exmoUserOpenOrders returnUserOpenOrders();
+
 
 }

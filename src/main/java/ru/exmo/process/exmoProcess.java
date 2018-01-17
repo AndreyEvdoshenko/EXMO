@@ -33,6 +33,9 @@ public class exmoProcess {
     private publicApi publicApi;
 
     @Autowired
+    private tradingApi tradingApi;
+
+    @Autowired
     private tradingDAO dao;
 
     private volatile Map<String, exmoTicker> ticker;
@@ -45,7 +48,8 @@ public class exmoProcess {
     @PostConstruct
     public void initProcess() {
         logger.info("@PostConstruct initProcess() invoke");
-        updateCurrnecPair();
+       // updateCurrnecPair();
+        tradingApi.returnUserOpenOrders();
 //        tradingApi.returnUserInfo();
 //        exmoOrderCreate order = new exmoOrderCreate();
 //        order.setPair(currencyPair.BTC_USD.getName());

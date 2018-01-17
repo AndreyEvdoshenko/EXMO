@@ -9,6 +9,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.exmo.model.data.exmoOrderCreate;
 import ru.exmo.model.data.exmoUserInfo;
+import ru.exmo.model.data.exmoUserOpenOrders;
 import ru.exmo.utils.HTTPClient;
 
 import javax.crypto.Mac;
@@ -80,6 +81,26 @@ public class tradingApiClient implements tradingApi {
             logger.error(e.getMessage());
         }
         return order;
+    }
+
+    @Override
+    public exmoUserOpenOrders returnUserOpenOrders() {
+
+        String resultJson = request(tradingApiMethods.EXMO_USER_OPEN_ORDERS, null);
+        try {
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+//            order.setResult(String.valueOf(jsonObject.get("result")));
+//            order.setError((String) jsonObject.get("error"));
+//            order.setOrder_id(String.valueOf(jsonObject.get("order_id")));
+//            logger.info(order);
+            int a = 0;
+            a++;
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+
+
+        return null;
     }
 
 

@@ -9,6 +9,14 @@ import ru.exmo.model.data.*;
 
 import javax.annotation.PostConstruct;
 
+import java.util.List;
+import java.util.Map;
+
+import static ru.exmo.model.data.currencyPairCondition.SELL;
+import static ru.exmo.model.data.currencyPairCondition.BUY;
+import static ru.exmo.model.data.currencyPairCondition.CREATE_SELL_ORDER;
+import static ru.exmo.model.data.currencyPairCondition.CREATE_BUY_ORDER;
+
 /**
  * Created by Andrash on 09.01.2018.
  */
@@ -116,12 +124,13 @@ public class exmoTradeProcess {
                 if (deviation > percentageOfExclusionBuy) {
                     logger.info(pair.getName() + " выставляем ордер на покупку по цене  " + currentValue);
                     logger.info("ticker " + pair.getName() + ": " + ticker);
-                    boolean isBuy = createBuyOrder(currentValue);
-                    if(isBuy){
+                    boolean isBuyOrderCreate = createBuyOrder(currentValue);
+                    if (isBuyOrderCreate) {
                         pair.setBuy(true);
+                        pair.setCurrentCondition(CREATE_BUY_ORDER);
                         pair.setExclusion_medium(deviation);
                         pair.setBuyValues(currentValue);
-                        pair.setSellValues(currentValue+(currentValue/100*pair.getPercentageOfExclusionSell()));
+                        pair.setSellValues(currentValue + (currentValue / 100 * pair.getPercentageOfExclusionSell()));
                     }
                 }
             } else if (mediumValue - currentValue < 0) {
@@ -130,6 +139,15 @@ public class exmoTradeProcess {
             } else {
                 logger.info(pair.getName() + " цена за 5 минут не изменилась от средней: " + mediumValue + ", текущаяя: " + currentValue);
             }
+        }
+
+        private boolean createSellOrder(float buyPrice) {
+
+            return false;
+        }
+
+        private void sell() {
+
         }
 
         @Override
@@ -141,15 +159,47 @@ public class exmoTradeProcess {
                     e.printStackTrace();
                 }
                 ticker = tickerProcess.returnTicker(pair);
-                if (!pair.isBuy()) {
-                   buy();
-                } else {
+                switch (pair.getCurrentCondition()) {
+                    case SELL:
+                        buy();
+                        break;
+                    case CREATE_BUY_ORDER:
+                        checkBuyOrderNotClose();
+                        break;
+                    case BUY:
+                        sell();
+                        break;
+                    case CREATE_SELL_ORDER:
+                        checkSellOrderNotClose();
+                        break;
+                }
+
+//                else {
 //                boolean sell = sellAnalise();
 //                if (sell) {
 //                    logger.info("ticker "+pair.getName()+": "+ticker);
 //                    createSellOrder();
 //                }
-                }
+        }
+    }
+
+        private void checkBuyOrderNotClose() {
+            Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
+            if(userOpenOrders.containsKey(pair.name())){
+                logger.info(pair.getName() + " имеются не закрытые ордера на покупку: " + userOpenOrders.get(pair.name()));
+                //todo проверять не надо ли их отменять
+            }else{
+                pair.setCurrentCondition(currencyPairCondition.BUY);            //куплено, ордера закрыты
+            }
+        }
+
+        private void checkSellOrderNotClose() {
+            Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
+            if(userOpenOrders.containsKey(pair.name())){
+                logger.info(pair.getName() + " имеются не закрытые ордера на продажу: " + userOpenOrders.get(pair.name()));
+                //todo проверять не надо ли их отменять
+            }else{
+                pair.setCurrentCondition(currencyPairCondition.SELL);            //продано, ордера закрыты
             }
         }
 

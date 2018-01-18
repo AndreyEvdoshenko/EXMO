@@ -5,13 +5,13 @@ package ru.exmo.model.data;
  */
 public class exmoUserOpenOrders {
 
-    private int order_id;          // идентификатор ордера
+    private int order_id;             // идентификатор ордера
     private String  created;          // дата и время создания ордера
     private String  type;             // тип ордера
-    private currencyPair   pair;            // валютная пара
-    private float   price;           // цена по ордеру
-    private float   quantity;        // кол-во по ордеру
-    private float   amount;          // сумма по ордеру
+    private currencyPair   pair;      // валютная пара
+    private float   price;            // цена по ордеру
+    private float   quantity;         // кол-во по ордеру
+    private float   amount;           // сумма по ордеру
 
     public exmoUserOpenOrders(){
 

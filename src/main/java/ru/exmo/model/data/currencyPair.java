@@ -32,7 +32,7 @@ public enum  currencyPair {
     private float max_amount;      //максимальная сумма по ордеру
 
     private boolean active;        //торгуем ли данной парой
-    private currencyPairCondition currentCondition;   //текущее состояние
+    private currencyPairCondition currentCondition = currencyPairCondition.SELL;   //текущее состояние
 
     private float      mediumValues;         //среднее значение за интервал времени
     private float      buyValues;            //цена по коротой купили

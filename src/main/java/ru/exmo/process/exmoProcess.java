@@ -59,36 +59,6 @@ public class exmoProcess {
 //        tradingApi.createOrder(order);
     }
 
-    private boolean sellAnalise(currencyPair pair) {
-        float currentValue = ticker.get(pair.name()).getBuy_price();
-        float buyValue = pair.getBuyValues();
-        float percentageOfExclusionSell = (float) pair.getPercentageOfExclusionSell();
-        float getPercentageOfNoReturn = (float) pair.getPercentageOfNoReturn();
-        if (buyValue - currentValue > 0) {
-            double deviation = 100 - ((currentValue * 100) / buyValue);
-            logger.info(pair.getName() + " цена упала от закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
-            if (deviation > getPercentageOfNoReturn) {
-                pair.setExclusion_buy((float) deviation);
-                pair.setSellValues(currentValue);
-                pair.setSellProfit(false);
-                logger.info(pair.getName() + " выставляем ордер на продажу по цене, выходим в минус" + buyValue);
-                return true;
-            }
-        } else if (buyValue - currentValue < 0) {
-            double deviation = ((currentValue * 100) / buyValue) - 100;
-            logger.info(pair.getName() + " цена поднялась от закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
-            if (deviation > percentageOfExclusionSell) {
-                pair.setExclusion_buy((float) deviation);
-                pair.setSellValues(currentValue);
-                pair.setSellProfit(true);
-                logger.info(pair.getName() + " выставляем ордер на продажу по цене, выходим в плюс " + buyValue);
-                return true;
-            }
-        } else {
-            logger.info(pair.getName() + " цена не изменилась от закупки: " + buyValue + ", текущаяя: " + currentValue);
-        }
-        return false;
-    }
 
     private void updateCurrnecPair() {
         publicApi.loadPairSettings();

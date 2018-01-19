@@ -15,4 +15,5 @@ public interface tradingDAO {
     Map<String, List<Float>> dataOverPeriodOfTime(Timestamp startTime, Timestamp endTime, List<currencyPair> pairs);
     void createOrder(exmoOrderCreate order);
     void initCurrencyPairSettings();
+    void initCurrencyPairSettings(currencyPair pair);
 }

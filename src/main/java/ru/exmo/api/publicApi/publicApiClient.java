@@ -166,7 +166,7 @@ public class publicApiClient implements publicApi {
 
     @Override
     public void loadPairSettings() {
-        logger.info("invoke loadPairSettings()");
+        logger.info("invoke loadPairSettings all");
         String URL = publicApiMethods.EXMO_PAIR_SETTINGS.getUrl();
         try {
             String resultJson = httpClient.getHttp(URL, null);
@@ -181,6 +181,31 @@ public class publicApiClient implements publicApi {
                 currentPair.setMin_amount(Float.valueOf(currentExmoPair.get("min_amount")));
                 currentPair.setMax_amount(Float.valueOf(currentExmoPair.get("max_amount")));
                 logger.info(currentPair.name() + ": " + currentPair);
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        } catch (ParseException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public synchronized void loadPairSettings(currencyPair pair) {
+        logger.info(pair.name() + ": invoke loadPairSettings");
+        String URL = publicApiMethods.EXMO_PAIR_SETTINGS.getUrl();
+        try {
+            String resultJson = httpClient.getHttp(URL, null);
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+            Map<String, String> currentExmoPair = (Map<String, String>) jsonObject.get(pair.name());
+            if (currentExmoPair != null) {
+                pair.setPair(pair.name());
+                pair.setMin_quantity(Float.valueOf(currentExmoPair.get("min_quantity")));
+                pair.setMax_quantity(Float.valueOf(currentExmoPair.get("max_quantity")));
+                pair.setMin_price(Float.valueOf(currentExmoPair.get("min_price")));
+                pair.setMax_price(Float.valueOf(currentExmoPair.get("max_price")));
+                pair.setMin_amount(Float.valueOf(currentExmoPair.get("min_amount")));
+                pair.setMax_amount(Float.valueOf(currentExmoPair.get("max_amount")));
+                logger.info(pair.name() + ": " + pair);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());

@@ -29,4 +29,8 @@ public interface publicApi {
      Настройки валютных пар
      */
     void loadPairSettings();
+    /**
+     Настройки конкретной валютной пары
+     */
+    void loadPairSettings(currencyPair pair);
 }

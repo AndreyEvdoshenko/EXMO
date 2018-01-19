@@ -3,15 +3,13 @@ package ru.exmo.process;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.exmo.api.publicApi.publicApi;
 import ru.exmo.api.tradingApi.tradingApi;
 import ru.exmo.dao.tradingDAO;
 import ru.exmo.model.data.*;
-
 import javax.annotation.PostConstruct;
-
 import java.util.List;
 import java.util.Map;
-
 import static ru.exmo.model.data.currencyPairCondition.SELL;
 import static ru.exmo.model.data.currencyPairCondition.BUY;
 import static ru.exmo.model.data.currencyPairCondition.CREATE_SELL_ORDER;
@@ -30,6 +28,9 @@ public class exmoTradeProcess {
 
     @Autowired
     private tradingApi tradingApi;
+
+    @Autowired
+    private publicApi publicApi;
 
     @Autowired
     private exmoTickerProcess tickerProcess;
@@ -171,6 +172,8 @@ public class exmoTradeProcess {
 
         @Override
         public void run() {
+            publicApi.loadPairSettings(pair);
+            dao.initCurrencyPairSettings(pair);
             while (!Thread.interrupted()) {
                 try {
                     Thread.sleep(1000);

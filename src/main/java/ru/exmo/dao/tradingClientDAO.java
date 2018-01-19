@@ -96,4 +96,20 @@ public class tradingClientDAO implements tradingDAO {
             }
     }
 
+    @Override
+    public synchronized void initCurrencyPairSettings(currencyPair pair) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("pair", pair.getPair());
+        String sql = "select * from exmoCurrencyairSettings WHERE pair = :pair";
+        List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, params);
+        if (list != null && list.get(0) != null) {
+            pair = currencyPair.valueOf((String) list.get(0).get("pair"));
+            pair.setPercentageOfExclusionBuy(Float.valueOf((String) list.get(0).get("percentageofexclusionbuy")));
+            pair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(0).get("percentageofexclusionsell")));
+            pair.setPercentageOfNoReturn(Float.valueOf((String) list.get(0).get("percentageofnoreturn")));
+            pair.setActive(Boolean.valueOf((String) list.get(0).get("active")));
+        }
+    }
+
+
 }

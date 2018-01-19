@@ -68,7 +68,7 @@ public class exmoTickerProcess {
                     medium += Float.valueOf(String.valueOf(list.get(i)));
                 }
                 currentPair.setMediumValues(medium / list.size());
-                logger.info("среднее для валютной пары " + pair + " за последние " + interval / 60000 + " минут = " + medium / list.size());
+                logger.info(currentPair.name()+": среднее значение за последние " + interval / 60000 + " минут = " + medium / list.size());
             }
         }
     }

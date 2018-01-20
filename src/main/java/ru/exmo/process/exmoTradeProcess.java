@@ -115,6 +115,7 @@ public class exmoTradeProcess {
                         pair.setExclusion_medium(deviation);
                         pair.setBuyValues(currentValue);
                         pair.setSellValues(currentValue + (currentValue / 100 * pair.getPercentageOfExclusionSell()));
+                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else if (mediumValue - currentValue < 0) {
@@ -167,6 +168,7 @@ public class exmoTradeProcess {
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
                         pair.setCurrentCondition(CREATE_SELL_ORDER);
+                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else if (buyValue - currentValue < 0) {
@@ -180,6 +182,7 @@ public class exmoTradeProcess {
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
                         pair.setCurrentCondition(CREATE_SELL_ORDER);
+                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else {
@@ -222,6 +225,7 @@ public class exmoTradeProcess {
                 //todo проверять не надо ли их отменять
             }else{
                 pair.setCurrentCondition(currencyPairCondition.BUY);            //куплено, ордера закрыты
+                dao.updateCurrencyPairSettings(pair);
                 logger.info(pair.getName() + ": ордера на покупку закрыты");
             }
         }
@@ -233,6 +237,7 @@ public class exmoTradeProcess {
                 //todo проверять не надо ли их отменять
             }else{
                 pair.setCurrentCondition(currencyPairCondition.SELL);            //продано, ордера закрыты
+                dao.updateCurrencyPairSettings(pair);
                 logger.info(pair.getName() + ": ордера на продажу закрыты");
             }
         }

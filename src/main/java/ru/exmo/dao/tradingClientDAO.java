@@ -65,12 +65,11 @@ public class tradingClientDAO implements tradingDAO {
         params.put("medium_price", order.getMedium_price());
         params.put("exclusion_medium", order.getExclusion_medium());
         params.put("exclusion_buy", order.getExclusion_buy());
-        params.put("profit", order.getProfit());
         params.put("updated", order.getUpdated());
         params.put("id", order.getOrder_id());
         params.put("status", "open");
 
-        String sql = "insert into exmoOrders (pair,id,type,quantity,price,medium_price,exclusion_medium,exclusion_buy,profit,status,updated) " +
+        String sql = "insert into exmoOrders (pair,id,type,quantity,price,medium_price,exclusion_medium,exclusion_buy,status,updated) " +
                 "values (:pair," +
                 ":id," +
                 ":type," +
@@ -79,7 +78,6 @@ public class tradingClientDAO implements tradingDAO {
                 ":medium_price," +
                 ":exclusion_medium," +
                 ":exclusion_buy," +
-                ":profit," +
                 ":status," +
                 ":updated)";
 
@@ -127,9 +125,9 @@ public class tradingClientDAO implements tradingDAO {
         Map<String, Object> params = new HashMap<>();
         params.put("currentcondition", pair.getCurrentCondition().name());
         params.put("pair", pair.getPair());
-        params.put("orderid", pair.getBuyOrderId());
+        params.put("idorder", pair.getBuyOrderId());
         jdbcTemplate.update(
-                "update exmoCurrencyairSettings set currentcondition = :currentcondition, orderid =:orderid WHERE pair = :pair",
+                "update exmoCurrencyairSettings set currentcondition = :currentcondition, idorder =:idorder WHERE pair = :pair",
                 params);
     }
 

@@ -43,7 +43,7 @@ public class exmoTradeProcess {
     public void initTickerProcess() {
         logger.info("@PostConstruct initProcess() invoke");
         new Thread(new tradePair(currencyPair.BTC_USD)).start();
-        new Thread(new tradePair(currencyPair.ETH_USD)).start();
+//        new Thread(new tradePair(currencyPair.ETH_USD)).start();
 //        new Thread(new tradePair(currencyPair.LTC_RUB)).start();
 //        new Thread(new tradePair(currencyPair.BTC_EUR)).start();
 //        new Thread(new tradePair(currencyPair.BTC_RUB)).start();
@@ -127,7 +127,7 @@ public class exmoTradeProcess {
             }
         }
 
-        private boolean createSellOrder(float buyPrice) {
+        private boolean createSellOrder(float sellPrice) {
             exmoUserInfo user = tradingApi.returnUserInfo();
 
             exmoOrderCreate sellOrder = new exmoOrderCreate();
@@ -136,26 +136,27 @@ public class exmoTradeProcess {
             Float amount = Float.valueOf(str);
             sellOrder.setQuantity(amount); // продавать все что есть
             sellOrder.setType(exmoTypeOrder.sell);
-            sellOrder.setPrice(pair.getSellValues());
+            sellOrder.setPrice(sellPrice);
             //  sellOrder.setPrice(0);
             sellOrder.setMedium_price(pair.getMediumValues());
             sellOrder.setExclusion_medium(pair.getExclusion_medium());
             sellOrder.setExclusion_buy(pair.getExclusion_buy());
             sellOrder = tradingApi.createOrder(sellOrder);
             if ("true".equals(sellOrder.getResult())) {
-                if (!pair.isSellProfit()) sellOrder.setProfit("minus");
-                else sellOrder.setProfit("plus");
+//                if (!pair.isSellProfit()) sellOrder.setProfit("minus");
+//                else sellOrder.setProfit("plus");
                 pair.setBuyOrderId("0");
                 dao.createOrder(sellOrder);
                 logger.info(pair.name()+ ": ордер на продажу  выставлен");
+                return true;
             } else {
                 logger.error(pair.name()+ ": ордер на продажу не получилось, причина " + sellOrder.getError());
+                return false;
             }
-            return false;
         }
 
         private void sell() {
-            float currentValue = ticker.getBuy_price();
+            float currentValue = ticker.getSell_price();
             float buyValue = pair.getBuyValues();
             float percentageOfExclusionSell =  pair.getPercentageOfExclusionSell();
             float getPercentageOfNoReturn =  pair.getPercentageOfNoReturn();
@@ -175,7 +176,7 @@ public class exmoTradeProcess {
                 }
             } else if (buyValue - currentValue < 0) {
                 float deviation = ((currentValue * 100) / buyValue) - 100;
-                logger.info(pair.getName() + ": цена выше  закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
+                logger.info(pair.getName() + ": цена выше закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
                 if (deviation > percentageOfExclusionSell) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в плюс " + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);

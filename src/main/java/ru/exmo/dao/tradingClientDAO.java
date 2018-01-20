@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.exmo.model.data.currencyPair;
+import ru.exmo.model.data.currencyPairCondition;
 import ru.exmo.model.data.exmoOrderCreate;
 
 import java.sql.Timestamp;
@@ -93,6 +94,7 @@ public class tradingClientDAO implements tradingDAO {
             currentPair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(i).get("percentageofexclusionsell")));
             currentPair.setPercentageOfNoReturn(Float.valueOf((String) list.get(i).get("percentageofnoreturn")));
             currentPair.setActive(Boolean.valueOf((String) list.get(i).get("active")));
+            currentPair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(i).get("currentcondition")));
             }
     }
 
@@ -108,7 +110,18 @@ public class tradingClientDAO implements tradingDAO {
             pair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(0).get("percentageofexclusionsell")));
             pair.setPercentageOfNoReturn(Float.valueOf((String) list.get(0).get("percentageofnoreturn")));
             pair.setActive(Boolean.valueOf((String) list.get(0).get("active")));
+            pair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(0).get("currentcondition")));
         }
+    }
+
+    @Override
+    public void updateCurrencyPairSettings(currencyPair pair) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("currentcondition", pair.getCurrentCondition().name());
+        params.put("pair", pair.getPair());
+        jdbcTemplate.update(
+                "update exmoCurrencyairSettings set currentcondition = :currentcondition WHERE pair = :pair",
+                params);
     }
 
 

@@ -16,4 +16,5 @@ public interface tradingDAO {
     void createOrder(exmoOrderCreate order);
     void initCurrencyPairSettings();
     void initCurrencyPairSettings(currencyPair pair);
+    void updateCurrencyPairSettings(currencyPair pair);
 }

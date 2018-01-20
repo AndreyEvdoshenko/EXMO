@@ -14,6 +14,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,6 +23,31 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class HTTPClient {
+
+
+    private final Logger logger = Logger.getLogger(HTTPClient.class);
+
+    private volatile int currentCountCall;
+    private final int allowedCountCall = 3;
+
+    HTTPClient(){
+        currentCountCall = 0;
+    }
+
+    public  boolean isCallAllowed(){
+        if(currentCountCall<allowedCountCall){
+            currentCountCall++;
+      //      logger.info("currentCountCall = "+currentCountCall);
+            return true;
+        }
+        return false;
+    }
+
+    @Scheduled(fixedRate =  1500)
+    public void resetCount(){
+        currentCountCall = 0;
+    }
+
 
     public String postHttp(String url, List<NameValuePair> params, List<NameValuePair> headers) throws IOException {
         HttpPost post = new HttpPost(url);
@@ -34,7 +61,10 @@ public class HTTPClient {
         }
 
         HttpClient httpClient = HttpClientBuilder.create().build();
+      //  logger.info(url+": ожидание вызова postHttp...");
+        while (!isCallAllowed()) {}
         HttpResponse response = httpClient.execute(post);
+     //   logger.info(url+": вызвано ");
 
         HttpEntity entity = response.getEntity();
         if (entity != null) {
@@ -53,7 +83,10 @@ public class HTTPClient {
             }
         }
         HttpClient httpClient = HttpClientBuilder.create().build();
+     //  logger.info(url+": ожидание вызова getHttp ...");
+        while (!isCallAllowed()) {}
         HttpResponse response = httpClient.execute(request);
+    //    logger.info(url+": вызвано ");
 
         HttpEntity entity = response.getEntity();
         if (entity != null) {

@@ -44,6 +44,23 @@ public class exmoTradeProcess {
         logger.info("@PostConstruct initProcess() invoke");
         new Thread(new tradePair(currencyPair.BTC_USD)).start();
         new Thread(new tradePair(currencyPair.ETH_USD)).start();
+//        new Thread(new tradePair(currencyPair.LTC_RUB)).start();
+//        new Thread(new tradePair(currencyPair.BTC_EUR)).start();
+//        new Thread(new tradePair(currencyPair.BTC_RUB)).start();
+//        new Thread(new tradePair(currencyPair.ETH_EUR)).start();
+//        new Thread(new tradePair(currencyPair.ETH_RUB)).start();
+//        new Thread(new tradePair(currencyPair.LTC_EUR)).start();
+//        new Thread(new tradePair(currencyPair.LTC_USD)).start();
+//
+//        new Thread(new tradePair(currencyPair.BTC_USD)).start();
+//        new Thread(new tradePair(currencyPair.ETH_USD)).start();
+//        new Thread(new tradePair(currencyPair.LTC_RUB)).start();
+//        new Thread(new tradePair(currencyPair.BTC_EUR)).start();
+//        new Thread(new tradePair(currencyPair.BTC_RUB)).start();
+//        new Thread(new tradePair(currencyPair.ETH_EUR)).start();
+//        new Thread(new tradePair(currencyPair.ETH_RUB)).start();
+//        new Thread(new tradePair(currencyPair.LTC_EUR)).start();
+//        new Thread(new tradePair(currencyPair.LTC_USD)).start();
     }
 
 //**********************************************************************************************************************
@@ -141,7 +158,7 @@ public class exmoTradeProcess {
             float getPercentageOfNoReturn =  pair.getPercentageOfNoReturn();
             if (buyValue - currentValue > 0) {
                 float deviation = 100 - ((currentValue * 100) / buyValue);
-                logger.info(pair.getName() + ": цена упала от закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
+                logger.info(pair.getName() + ": цена ниже закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
                 if (deviation > getPercentageOfNoReturn) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в минус" + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);
@@ -154,7 +171,7 @@ public class exmoTradeProcess {
                 }
             } else if (buyValue - currentValue < 0) {
                 float deviation = ((currentValue * 100) / buyValue) - 100;
-                logger.info(pair.getName() + ": цена поднялась от закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
+                logger.info(pair.getName() + ": цена выше  закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
                 if (deviation > percentageOfExclusionSell) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в плюс " + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);

@@ -205,7 +205,6 @@ public class publicApiClient implements publicApi {
                 pair.setMax_price(Float.valueOf(currentExmoPair.get("max_price")));
                 pair.setMin_amount(Float.valueOf(currentExmoPair.get("min_amount")));
                 pair.setMax_amount(Float.valueOf(currentExmoPair.get("max_amount")));
-                logger.info(pair.name() + ": " + pair);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());

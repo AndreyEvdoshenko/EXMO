@@ -65,7 +65,7 @@ public class tradingApiClient implements tradingApi {
     @Override
     public exmoOrderCreate createOrder(exmoOrderCreate order) {
         logger.info("invoke createOrder for pair "+order.getPair());
-        logger.info("order: "+order);
+        //logger.info("order: "+order);
 
         Map<String, String> params = new HashMap<>();
         params.put("pair", order.getPair());
@@ -79,7 +79,7 @@ public class tradingApiClient implements tradingApi {
             order.setResult(String.valueOf(jsonObject.get("result")));
             order.setError((String) jsonObject.get("error"));
             order.setOrder_id(String.valueOf(jsonObject.get("order_id")));
-            logger.info(order);
+            logger.info("order: "+order);
         } catch (ParseException e) {
             logger.error(e.getMessage());
         }

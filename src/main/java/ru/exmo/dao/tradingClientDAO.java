@@ -67,9 +67,12 @@ public class tradingClientDAO implements tradingDAO {
         params.put("exclusion_buy", order.getExclusion_buy());
         params.put("profit", order.getProfit());
         params.put("updated", order.getUpdated());
+        params.put("id", order.getOrder_id());
+        params.put("status", "open");
 
-        String sql = "insert into exmoOrders (pair,type,quantity,price,medium_price,exclusion_medium,exclusion_buy,profit,updated) " +
+        String sql = "insert into exmoOrders (pair,id,type,quantity,price,medium_price,exclusion_medium,exclusion_buy,profit,status,updated) " +
                 "values (:pair," +
+                ":id," +
                 ":type," +
                 ":quantity," +
                 ":price," +
@@ -77,6 +80,7 @@ public class tradingClientDAO implements tradingDAO {
                 ":exclusion_medium," +
                 ":exclusion_buy," +
                 ":profit," +
+                ":status," +
                 ":updated)";
 
         jdbcTemplate.update(sql,params);
@@ -86,7 +90,8 @@ public class tradingClientDAO implements tradingDAO {
     @Override
     public void initCurrencyPairSettings() {
         Map<String, Object> params = new HashMap<>();
-        String sql = "select * from exmoCurrencyairSettings";
+        String sql = "select * from exmoCurrencyairSettings join exmoorders on " +
+                "exmoCurrencyairSettings.idorder = exmoorders.id";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,params);
         for (int i = 0; i < list.size(); i++) {
             currencyPair currentPair = currencyPair.valueOf((String)list.get(i).get("pair"));
@@ -95,6 +100,7 @@ public class tradingClientDAO implements tradingDAO {
             currentPair.setPercentageOfNoReturn(Float.valueOf((String) list.get(i).get("percentageofnoreturn")));
             currentPair.setActive(Boolean.valueOf((String) list.get(i).get("active")));
             currentPair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(i).get("currentcondition")));
+            currentPair.setBuyValues(Float.valueOf((String)list.get(i).get("price")));
             }
     }
 
@@ -102,7 +108,8 @@ public class tradingClientDAO implements tradingDAO {
     public synchronized void initCurrencyPairSettings(currencyPair pair) {
         Map<String, Object> params = new HashMap<>();
         params.put("pair", pair.getPair());
-        String sql = "select * from exmoCurrencyairSettings WHERE pair = :pair";
+        String sql = "select * from exmoCurrencyairSettings join exmoorders on " +
+                "exmoCurrencyairSettings.idorder = exmoorders.id";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, params);
         if (list != null && list.get(0) != null) {
             pair = currencyPair.valueOf((String) list.get(0).get("pair"));
@@ -111,6 +118,7 @@ public class tradingClientDAO implements tradingDAO {
             pair.setPercentageOfNoReturn(Float.valueOf((String) list.get(0).get("percentageofnoreturn")));
             pair.setActive(Boolean.valueOf((String) list.get(0).get("active")));
             pair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(0).get("currentcondition")));
+            pair.setBuyValues(Float.valueOf((String)list.get(0).get("price")));
         }
     }
 
@@ -119,8 +127,9 @@ public class tradingClientDAO implements tradingDAO {
         Map<String, Object> params = new HashMap<>();
         params.put("currentcondition", pair.getCurrentCondition().name());
         params.put("pair", pair.getPair());
+        params.put("orderid", pair.getBuyOrderId());
         jdbcTemplate.update(
-                "update exmoCurrencyairSettings set currentcondition = :currentcondition WHERE pair = :pair",
+                "update exmoCurrencyairSettings set currentcondition = :currentcondition, orderid =:orderid WHERE pair = :pair",
                 params);
     }
 

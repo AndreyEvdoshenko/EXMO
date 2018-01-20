@@ -38,6 +38,7 @@ public enum  currencyPair {
     private float      buyValues;            //цена по коротой купили
     private float      sellValues;           //цена по коротой надо продавать
     private boolean    isBuy = false;        //куплено?
+    private String     buyOrderId;           //id последнего ордера на покупку
     private boolean    sellProfit;             //Продано в плюс?
 
     private float exclusion_medium;          // отклонение от среднего на момент покупки
@@ -94,6 +95,14 @@ public enum  currencyPair {
 
     public void setPercentageOfExclusionSell(float percentageOfExclusionSell) {
         this.percentageOfExclusionSell = percentageOfExclusionSell;
+    }
+
+    public String getBuyOrderId() {
+        return buyOrderId;
+    }
+
+    public void setBuyOrderId(String buyOrderId) {
+        this.buyOrderId = buyOrderId;
     }
 
     public float getExclusion_medium() {

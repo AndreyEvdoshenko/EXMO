@@ -89,6 +89,7 @@ public class exmoTradeProcess {
             buyOrder = tradingApi.createOrder(buyOrder);
             if ("true".equals(buyOrder.getResult())) {
                 dao.createOrder(buyOrder);
+                pair.setBuyOrderId(buyOrder.getOrder_id());
                 logger.info(pair.name()+ ": ордер на покупку выставлен");
                 return true;
             } else {
@@ -144,6 +145,7 @@ public class exmoTradeProcess {
             if ("true".equals(sellOrder.getResult())) {
                 if (!pair.isSellProfit()) sellOrder.setProfit("minus");
                 else sellOrder.setProfit("plus");
+                pair.setBuyOrderId("0");
                 dao.createOrder(sellOrder);
                 logger.info(pair.name()+ ": ордер на продажу  выставлен");
             } else {

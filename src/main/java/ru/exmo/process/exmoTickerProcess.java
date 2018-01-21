@@ -76,7 +76,7 @@ public class exmoTickerProcess {
 
     @Scheduled(fixedRate = 2000)
     public void process() {
-        ticker = publicApi.returnTicker();
+        ticker = publicApi.returnTicker(ticker);
     }
 
     public exmoTicker returnTicker(currencyPair pair){

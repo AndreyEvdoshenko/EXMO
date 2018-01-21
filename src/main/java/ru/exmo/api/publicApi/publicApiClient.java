@@ -129,7 +129,7 @@ public class publicApiClient implements publicApi {
     }
 
     @Override
-    public Map<String, exmoTicker> returnTicker() {
+    public Map<String, exmoTicker> returnTicker(Map<String, exmoTicker> oldTicker) {
       //  logger.info("invoke returnTicker()");
         Map<String,exmoTicker> listTicker = new HashMap<>();
         try {
@@ -157,10 +157,13 @@ public class publicApiClient implements publicApi {
                 //logger.info("ticker " + ticker.getPair() + ": " + ticker);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            listTicker = oldTicker;
+            logger.error("IOException "+e.getMessage());
         } catch (ParseException e) {
-            logger.error(e.getMessage());
+            listTicker = oldTicker;
+            logger.error("ParseException "+e.getMessage());
         }
+
         return listTicker;
     }
 

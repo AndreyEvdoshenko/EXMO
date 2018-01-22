@@ -9,6 +9,7 @@ public class exmoTrade {
 
     private String pair;
     private String trade_id;
+    private String order_id;
     private String type;
     private String price;
     private String quantity;
@@ -24,6 +25,15 @@ public class exmoTrade {
 
     public void setPair(String pair) {
         this.pair = pair;
+    }
+
+
+    public String getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(String order_id) {
+        this.order_id = order_id;
     }
 
     public String getTrade_id() {

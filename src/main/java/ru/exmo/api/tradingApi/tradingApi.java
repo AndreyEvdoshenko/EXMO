@@ -1,8 +1,6 @@
 package ru.exmo.api.tradingApi;
 
-import ru.exmo.model.data.exmoOrderCreate;
-import ru.exmo.model.data.exmoUserInfo;
-import ru.exmo.model.data.exmoUserOpenOrders;
+import ru.exmo.model.data.*;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +34,13 @@ public interface tradingApi {
      Список открытых ордеров ордера
      */
    Map<String,List<exmoUserOpenOrders>> returnUserOpenOrders();
+
+    /**
+     Список сделок пользователя по валютной паре
+    */
+    exmoTrade returnLastUserTrades(currencyPair pair);
+
+
 
 
 }

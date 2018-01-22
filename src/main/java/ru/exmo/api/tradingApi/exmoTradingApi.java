@@ -8,10 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.exmo.model.data.currencyPair;
-import ru.exmo.model.data.exmoOrderCreate;
-import ru.exmo.model.data.exmoUserInfo;
-import ru.exmo.model.data.exmoUserOpenOrders;
+import ru.exmo.model.data.*;
 import ru.exmo.utils.HTTPClient;
 
 import javax.crypto.Mac;
@@ -117,8 +114,32 @@ public class exmoTradingApi implements tradingApi {
     }
 
     @Override
-    public void returnUserTrades(currencyPair pair) {
+    public exmoTrade returnLastUserTrades(currencyPair pair) {
+        exmoTrade trade = new exmoTrade();
+        Map<String, String> params = new HashMap<>();
+        params.put("pair", pair.getName());
+        params.put("offset", "0");
+        params.put("limit", "1");
 
+        String resultJson = request(tradingApiMethods.EXMO_USER_TRADES, params);
+
+        try {
+            JSONObject jsonObject = (JSONObject) JSONValue.parseWithException(resultJson);
+            JSONArray tradeList = (JSONArray) jsonObject.get(pair.getName());
+            Map<String, Object> currentExmoTrade = (Map<String, Object>) tradeList.get(0);
+
+            trade.setPair(pair.name());
+            trade.setTrade_id(String.valueOf(currentExmoTrade.get("trade_id")));
+            trade.setOrder_id(String.valueOf(currentExmoTrade.get("order_id")));
+            trade.setType((String) currentExmoTrade.get("type"));
+            trade.setPrice((String) currentExmoTrade.get("price"));
+            trade.setQuantity((String) currentExmoTrade.get("quantity"));
+            trade.setAmount((String) currentExmoTrade.get("amount"));
+            trade.setDate(String.valueOf(currentExmoTrade.get("date")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return trade;
     }
 
 

@@ -18,7 +18,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -27,9 +26,9 @@ import java.util.*;
  * Created by Андрей on 03.01.2018.
  */
 
-public class tradingApiClient implements tradingApi {
+public class exmoTradingApi implements tradingApi {
 
-    private final Logger logger = Logger.getLogger(tradingApiClient.class);
+    private final Logger logger = Logger.getLogger(exmoTradingApi.class);
 
     private String _key;
     private String _secret;
@@ -40,7 +39,7 @@ public class tradingApiClient implements tradingApi {
     private HTTPClient httpClient;
 
 
-    public tradingApiClient() {
+    public exmoTradingApi() {
         _nonce = System.nanoTime();
     }
 
@@ -115,6 +114,11 @@ public class tradingApiClient implements tradingApi {
             logger.error(e.getMessage());
         }
         return orders;
+    }
+
+    @Override
+    public void returnUserTrades(currencyPair pair) {
+
     }
 
 

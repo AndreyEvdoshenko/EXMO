@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ru.exmo.api.tradingApi.tradingApi;
-import ru.exmo.api.tradingApi.tradingApiClient;
+import ru.exmo.api.tradingApi.exmoTradingApi;
 
 import javax.sql.DataSource;
 
@@ -42,7 +42,7 @@ public class exmoConfiguration {
 
     @Bean
     public tradingApi tradingApi(){
-        tradingApi apiClient = new tradingApiClient();
+        tradingApi apiClient = new exmoTradingApi();
         apiClient.setKey(environment.getProperty("key"));
         apiClient.setSecret(environment.getProperty("secret"));
         return apiClient;

@@ -75,6 +75,26 @@ public class exmoTradeProcess {
             this.pair = pair;
         }
 
+        private void init(){
+            logger.info(pair.getName() + ": иницилизация настроект для торговли по паре....");
+            publicApi.loadPairSettings(pair);
+          //  dao.initCurrencyPairSettings(pair); //todo раскоменитровать
+            Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
+            if(userOpenOrders.containsKey(pair.name())){
+                exmoUserOpenOrders openOrder = userOpenOrders.get(pair.name()).get(0);
+                if(currencyPairCondition.CREATE_SELL_ORDER.equals(openOrder.getType())){
+                    logger.info(pair.getName() + ": имеются не закрытые ордера на продажу" + openOrder);
+                    pair.setCurrentCondition(currencyPairCondition.CREATE_SELL_ORDER);
+                }else{
+                    logger.info(pair.getName() + ": имеются не закрытые ордера на покупку" + openOrder);
+                    pair.setCurrentCondition(currencyPairCondition.CREATE_BUY_ORDER);
+                }
+            }else{
+                exmoTrade lastTrade = tradingApi.returnLastUserTrades(pair);
+            }
+
+        }
+
 
         private boolean createBuyOrder(float buyPrice) {
             exmoOrderCreate buyOrder = new exmoOrderCreate();
@@ -82,7 +102,6 @@ public class exmoTradeProcess {
             buyOrder.setQuantity(pair.getMin_quantity() * 2);
             buyOrder.setType(exmoTypeOrder.buy);
             buyOrder.setPrice(buyPrice);
-            //buyOrder.setPrice(0);
             buyOrder.setMedium_price(pair.getMediumValues());
             buyOrder.setExclusion_medium(pair.getExclusion_medium());
             buyOrder.setExclusion_buy(0);
@@ -137,14 +156,11 @@ public class exmoTradeProcess {
             sellOrder.setQuantity(amount); // продавать все что есть
             sellOrder.setType(exmoTypeOrder.sell);
             sellOrder.setPrice(sellPrice);
-            //  sellOrder.setPrice(0);
             sellOrder.setMedium_price(pair.getMediumValues());
             sellOrder.setExclusion_medium(pair.getExclusion_medium());
             sellOrder.setExclusion_buy(pair.getExclusion_buy());
             sellOrder = tradingApi.createOrder(sellOrder);
             if ("true".equals(sellOrder.getResult())) {
-//                if (!pair.isSellProfit()) sellOrder.setProfit("minus");
-//                else sellOrder.setProfit("plus");
                 pair.setBuyOrderId("0");
                 dao.createOrder(sellOrder);
                 logger.info(pair.name()+ ": ордер на продажу  выставлен");
@@ -195,8 +211,7 @@ public class exmoTradeProcess {
 
         @Override
         public void run() {
-            publicApi.loadPairSettings(pair);
-            dao.initCurrencyPairSettings(pair);
+            init();
             while (!Thread.interrupted()) {
                 try {
                     Thread.sleep(1000);

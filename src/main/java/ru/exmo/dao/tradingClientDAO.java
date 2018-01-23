@@ -129,8 +129,8 @@ public class tradingClientDAO implements tradingDAO {
             pair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(0).get("percentageofexclusionsell")));
             pair.setPercentageOfNoReturn(Float.valueOf((String) list.get(0).get("percentageofnoreturn")));
             pair.setActive(Boolean.valueOf((String) list.get(0).get("active")));
-            pair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(0).get("currentcondition")));
-            if(list.get(0).get("price")!=null) pair.setBuyValues(Float.valueOf((String)list.get(0).get("price")));
+//            pair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(0).get("currentcondition")));
+//            if(list.get(0).get("price")!=null) pair.setBuyValues(Float.valueOf((String)list.get(0).get("price")));
         }
     }
 

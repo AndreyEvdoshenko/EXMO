@@ -92,11 +92,8 @@ public class tradingClientDAO implements tradingDAO {
                 "percentageofexclusionbuy, " +
                 "percentageofexclusionsell, " +
                 "percentageofnoreturn, " +
-                "active, " +
-                "currentcondition, " +
-                "price " +
-                " from exmoCurrencyairSettings left join exmoorders on " +
-                "exmoCurrencyairSettings.idorder = exmoorders.id";
+                "active " +
+                " from exmoCurrencyairSettings";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql,params);
         for (int i = 0; i < list.size(); i++) {
             currencyPair currentPair = currencyPair.valueOf((String)list.get(i).get("pair"));
@@ -104,8 +101,8 @@ public class tradingClientDAO implements tradingDAO {
             currentPair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(i).get("percentageofexclusionsell")));
             currentPair.setPercentageOfNoReturn(Float.valueOf((String) list.get(i).get("percentageofnoreturn")));
             currentPair.setActive(Boolean.valueOf((String) list.get(i).get("active")));
-            currentPair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(i).get("currentcondition")));
-            if(list.get(i).get("price")!=null) currentPair.setBuyValues(Float.valueOf((String)list.get(i).get("price")));
+//            currentPair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(i).get("currentcondition")));
+//            if(list.get(i).get("price")!=null) currentPair.setBuyValues(Float.valueOf((String)list.get(i).get("price")));
             }
     }
 
@@ -117,11 +114,8 @@ public class tradingClientDAO implements tradingDAO {
                 "percentageofexclusionbuy, " +
                 "percentageofexclusionsell, " +
                 "percentageofnoreturn, " +
-                "active, " +
-                "currentcondition, " +
-                "price " +
-                " from exmoCurrencyairSettings left join exmoorders on " +
-                "exmoCurrencyairSettings.idorder = exmoorders.id WHERE exmoCurrencyairSettings.pair = :pair";
+                "active " +
+                " from exmoCurrencyairSettings WHERE exmoCurrencyairSettings.pair = :pair";
         List<Map<String, Object>> list = jdbcTemplate.queryForList(sql, params);
         if (list != null && list.get(0) != null) {
             pair = currencyPair.valueOf((String) list.get(0).get("pair"));

@@ -78,21 +78,28 @@ public class exmoTradeProcess {
         private void init(){
             logger.info(pair.getName() + ": иницилизация настроект для торговли по паре....");
             publicApi.loadPairSettings(pair);
-          //  dao.initCurrencyPairSettings(pair); //todo раскоменитровать
+            dao.initCurrencyPairSettings(pair);
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
             if(userOpenOrders.containsKey(pair.name())){
                 exmoUserOpenOrders openOrder = userOpenOrders.get(pair.name()).get(0);
-                if(currencyPairCondition.CREATE_SELL_ORDER.equals(openOrder.getType())){
+                if("sell".equals(openOrder.getType())){
                     logger.info(pair.getName() + ": имеются не закрытые ордера на продажу" + openOrder);
                     pair.setCurrentCondition(currencyPairCondition.CREATE_SELL_ORDER);
-                }else{
+                }else if("buy".equals(openOrder.getType())){
                     logger.info(pair.getName() + ": имеются не закрытые ордера на покупку" + openOrder);
                     pair.setCurrentCondition(currencyPairCondition.CREATE_BUY_ORDER);
                 }
             }else{
                 exmoTrade lastTrade = tradingApi.returnLastUserTrades(pair);
+                if("sell".equals(lastTrade.getType())){
+                    logger.info(pair.getName() + ": последняя операция - продажа актива");
+                    pair.setCurrentCondition(currencyPairCondition.SELL);
+                }else if("buy".equals(lastTrade.getType())){
+                    logger.info(pair.getName() + ": последняя операция - окупка актива");
+                    pair.setBuyValues(Float.parseFloat(lastTrade.getPrice()));
+                    pair.setCurrentCondition(currencyPairCondition.BUY);
+                }
             }
-
         }
 
 

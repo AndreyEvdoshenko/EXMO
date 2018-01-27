@@ -46,12 +46,6 @@ public class exmoTickerProcess {
         restTemplate = new RestTemplate();
         evaluateMedium();
         tradingApi.returnUserInfo();
-//        exmoOrderCreate order = new exmoOrderCreate();
-//        order.setPair(currencyPair.BTC_USD.getName());
-//        order.setQuantity(0.001996F);
-//        order.setType(exmoTypeOrder.market_sell);
-//        order.setPrice(0);
-//        tradingApi.createOrder(order);
     }
 
     @Scheduled(fixedRate = 600000)

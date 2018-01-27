@@ -2,7 +2,6 @@ package ru.exmo.model.data;
 
 import org.json.simple.JSONObject;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 /**
@@ -11,58 +10,57 @@ import java.sql.Timestamp;
 public class exmoTicker {
 
     private String pair;
-    private BigDecimal high; // максимальная цена сделки за 24 часа
-    private BigDecimal low; //  минимальная цена сделки за 24 часа
-    private BigDecimal avg; // средняя цена сделки за 24 часа
-    private BigDecimal vol; //  объем всех сделок за 24 часа
-    private BigDecimal vol_curr; //  сумма всех сделок за 24 часа
+    private float high; // максимальная цена сделки за 24 часа
+    private float low; //  минимальная цена сделки за 24 часа
+    private float avg; // средняя цена сделки за 24 часа
+    private float vol; //  объем всех сделок за 24 часа
+    private float vol_curr; //  сумма всех сделок за 24 часа
     private float last_trade; //  цена последней сделки
     private float buy_price; //  текущая максимальная цена покупки
     private float sell_price; // текущая минимальная цена продажи
     private Timestamp updated; //  дата и время обновления данных
-    private float mediumValue; // среднее значение
-
+    
     public exmoTicker() {
 
     }
 
-    public BigDecimal getHigh() {
+    public float getHigh() {
         return high;
     }
 
-    public void setHigh(BigDecimal high) {
+    public void setHigh(float high) {
         this.high = high;
     }
 
-    public BigDecimal getLow() {
+    public float getLow() {
         return low;
     }
 
-    public void setLow(BigDecimal low) {
+    public void setLow(float low) {
         this.low = low;
     }
 
-    public BigDecimal getAvg() {
+    public float getAvg() {
         return avg;
     }
 
-    public void setAvg(BigDecimal avg) {
+    public void setAvg(float avg) {
         this.avg = avg;
     }
 
-    public BigDecimal getVol() {
+    public float getVol() {
         return vol;
     }
 
-    public void setVol(BigDecimal vol) {
+    public void setVol(float vol) {
         this.vol = vol;
     }
 
-    public BigDecimal getVol_curr() {
+    public float getVol_curr() {
         return vol_curr;
     }
 
-    public void setVol_curr(BigDecimal vol_curr) {
+    public void setVol_curr(float vol_curr) {
         this.vol_curr = vol_curr;
     }
 
@@ -104,14 +102,6 @@ public class exmoTicker {
 
     public void setPair(String pair) {
         this.pair = pair;
-    }
-
-    public float getMediumValue() {
-        return mediumValue;
-    }
-
-    public void setMediumValue(float mediumValue) {
-        this.mediumValue = mediumValue;
     }
 
     public  String toString(){

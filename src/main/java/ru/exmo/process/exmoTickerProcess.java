@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import ru.exmo.api.publicApi.publicApi;
 import ru.exmo.api.tradingApi.tradingApi;
 import ru.exmo.dao.tradingDAO;
@@ -25,11 +26,12 @@ import java.util.Map;
 public class exmoTickerProcess {
 
     private final Logger logger = Logger.getLogger(exmoTickerProcess.class);
-
+    private final String URL_TICKER = "http://localhost:8080/ticker";
 
     @Autowired
     private publicApi publicApi;
 
+    RestTemplate restTemplate;
     @Autowired
     private tradingApi tradingApi;
 
@@ -41,6 +43,7 @@ public class exmoTickerProcess {
     @PostConstruct
     public void initTickerProcess() {
         logger.info("@PostConstruct initProcess() invoke");
+        restTemplate = new RestTemplate();
         evaluateMedium();
         tradingApi.returnUserInfo();
 //        exmoOrderCreate order = new exmoOrderCreate();
@@ -55,10 +58,13 @@ public class exmoTickerProcess {
     private void evaluateMedium() {
         int interval = 600000;
         float medium = 0;
-        synchronized (exmoProcess.class) {
+        synchronized (exmoTickerProcess.class) {
             Map<String, List<Float>> tradeHistory = dao.dataOverPeriodOfTime(new Timestamp(System.currentTimeMillis() - interval),
                     new Timestamp(System.currentTimeMillis()),
                     Arrays.asList(currencyPair.BTC_USD));
+            if(tradeHistory.isEmpty()){
+                logger.warn("История торгов пуста!!! вероятно сломался тикер");
+            }
             for (Map.Entry entry : tradeHistory.entrySet()) {
                 String pair = (String) entry.getKey();
                 currencyPair currentPair = currencyPair.valueOf(pair);
@@ -74,13 +80,12 @@ public class exmoTickerProcess {
     }
 
 
-    @Scheduled(fixedRate = 2000)
-    public void process() {
-        ticker = publicApi.returnTicker(ticker);
-    }
 
     public exmoTicker returnTicker(currencyPair pair){
-        return ticker.get(pair.name());
+        StringBuilder url = new StringBuilder(URL_TICKER);
+        url.append("?pair=").append(pair.name());
+        exmoTicker ticker = restTemplate.getForObject(url.toString(), exmoTicker.class);
+        return ticker;
     }
 
 

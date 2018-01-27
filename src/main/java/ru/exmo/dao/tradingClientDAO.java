@@ -46,9 +46,9 @@ public class tradingClientDAO implements tradingDAO {
             } else {
                 listTrade = new ArrayList<>();
             }
-            listTrade.add(Float.valueOf(String.valueOf(list.get(i).get("sell_price"))));
-            //listTrade.add(Float.valueOf(String.valueOf(list.get(i).get("buy_price"))));
-            //listTrade.add(Float.valueOf(String.valueOf(list.get(i).get("last_trade"))));
+            listTrade.add(Float.parseFloat(String.valueOf(list.get(i).get("sell_price"))));
+            listTrade.add(Float.parseFloat(String.valueOf(list.get(i).get("buy_price"))));
+            listTrade.add(Float.parseFloat(String.valueOf(list.get(i).get("last_trade"))));
             tradeHistory.put(pair, listTrade);
         }
         return tradeHistory;
@@ -101,8 +101,6 @@ public class tradingClientDAO implements tradingDAO {
             currentPair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(i).get("percentageofexclusionsell")));
             currentPair.setPercentageOfNoReturn(Float.valueOf((String) list.get(i).get("percentageofnoreturn")));
             currentPair.setActive(Boolean.valueOf((String) list.get(i).get("active")));
-//            currentPair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(i).get("currentcondition")));
-//            if(list.get(i).get("price")!=null) currentPair.setBuyValues(Float.valueOf((String)list.get(i).get("price")));
             }
     }
 
@@ -123,8 +121,6 @@ public class tradingClientDAO implements tradingDAO {
             pair.setPercentageOfExclusionSell(Float.valueOf((String) list.get(0).get("percentageofexclusionsell")));
             pair.setPercentageOfNoReturn(Float.valueOf((String) list.get(0).get("percentageofnoreturn")));
             pair.setActive(Boolean.valueOf((String) list.get(0).get("active")));
-//            pair.setCurrentCondition(currencyPairCondition.valueOf((String) list.get(0).get("currentcondition")));
-//            if(list.get(0).get("price")!=null) pair.setBuyValues(Float.valueOf((String)list.get(0).get("price")));
         }
     }
 

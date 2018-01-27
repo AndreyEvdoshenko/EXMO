@@ -7,9 +7,15 @@ import ru.exmo.api.publicApi.publicApi;
 import ru.exmo.api.tradingApi.tradingApi;
 import ru.exmo.dao.tradingDAO;
 import ru.exmo.model.data.*;
+
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static ru.exmo.model.data.currencyPairCondition.SELL;
 import static ru.exmo.model.data.currencyPairCondition.BUY;
 import static ru.exmo.model.data.currencyPairCondition.CREATE_SELL_ORDER;
@@ -35,6 +41,10 @@ public class exmoTradeProcess {
     @Autowired
     private exmoTickerProcess tickerProcess;
 
+    private ExecutorService executorTradePair;
+
+    private Map<String, tradePair> activeTradePair;
+
     public exmoTradeProcess() {
 
     }
@@ -42,59 +52,60 @@ public class exmoTradeProcess {
     @PostConstruct
     public void initTickerProcess() {
         logger.info("@PostConstruct initProcess() invoke");
-        new Thread(new tradePair(currencyPair.BTC_USD)).start();
-//        new Thread(new tradePair(currencyPair.ETH_USD)).start();
-//        new Thread(new tradePair(currencyPair.LTC_RUB)).start();
-//        new Thread(new tradePair(currencyPair.BTC_EUR)).start();
-//        new Thread(new tradePair(currencyPair.BTC_RUB)).start();
-//        new Thread(new tradePair(currencyPair.ETH_EUR)).start();
-//        new Thread(new tradePair(currencyPair.ETH_RUB)).start();
-//        new Thread(new tradePair(currencyPair.LTC_EUR)).start();
-//        new Thread(new tradePair(currencyPair.LTC_USD)).start();
-//
-//        new Thread(new tradePair(currencyPair.BTC_USD)).start();
-//        new Thread(new tradePair(currencyPair.ETH_USD)).start();
-//        new Thread(new tradePair(currencyPair.LTC_RUB)).start();
-//        new Thread(new tradePair(currencyPair.BTC_EUR)).start();
-//        new Thread(new tradePair(currencyPair.BTC_RUB)).start();
-//        new Thread(new tradePair(currencyPair.ETH_EUR)).start();
-//        new Thread(new tradePair(currencyPair.ETH_RUB)).start();
-//        new Thread(new tradePair(currencyPair.LTC_EUR)).start();
-//        new Thread(new tradePair(currencyPair.LTC_USD)).start();
+        executorTradePair = Executors.newCachedThreadPool();
+        activeTradePair = new ConcurrentHashMap<>();
     }
 
-//**********************************************************************************************************************
+    public void runTradePair(currencyPair pair) {
+        logger.info(pair.getName() + ": запуск потока на торговлю");
+        tradePair tradePair = new tradePair(pair);
+        Thread currentTradePair =  new Thread(tradePair);
+        activeTradePair.put(pair.name(), tradePair);
+        executorTradePair.execute(currentTradePair);
+    }
+
+    public void stopTradePair(currencyPair pair) {
+        if (activeTradePair.containsKey(pair.name())) {
+            tradePair currentTradePair = activeTradePair.get(pair.name());
+            currentTradePair.interrupt();
+        } else {
+            logger.info(pair.getName() + ": поток на торговлю не найденб останавливать нечего");
+        }
+
+    }
+
+    //**********************************************************************************************************************
     private class tradePair implements Runnable {
 
 
         private currencyPair pair;
-
+        private boolean interrupted = false;
         private volatile exmoTicker ticker;
 
         tradePair(currencyPair pair) {
             this.pair = pair;
         }
 
-        private void init(){
+        private void init() {
             logger.info(pair.getName() + ": иницилизация настроект для торговли по паре....");
             publicApi.loadPairSettings(pair);
             dao.initCurrencyPairSettings(pair);
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
-            if(userOpenOrders.containsKey(pair.name())){
+            if (userOpenOrders.containsKey(pair.name())) {
                 exmoUserOpenOrders openOrder = userOpenOrders.get(pair.name()).get(0);
-                if("sell".equals(openOrder.getType())){
+                if ("sell".equals(openOrder.getType())) {
                     logger.info(pair.getName() + ": имеются не закрытые ордера на продажу" + openOrder);
                     pair.setCurrentCondition(currencyPairCondition.CREATE_SELL_ORDER);
-                }else if("buy".equals(openOrder.getType())){
+                } else if ("buy".equals(openOrder.getType())) {
                     logger.info(pair.getName() + ": имеются не закрытые ордера на покупку" + openOrder);
                     pair.setCurrentCondition(currencyPairCondition.CREATE_BUY_ORDER);
                 }
-            }else{
+            } else {
                 exmoTrade lastTrade = tradingApi.returnLastUserTrades(pair);
-                if("sell".equals(lastTrade.getType())){
+                if ("sell".equals(lastTrade.getType())) {
                     logger.info(pair.getName() + ": последняя операция - продажа актива");
                     pair.setCurrentCondition(currencyPairCondition.SELL);
-                }else if("buy".equals(lastTrade.getType())){
+                } else if ("buy".equals(lastTrade.getType())) {
                     logger.info(pair.getName() + ": последняя операция - окупка актива");
                     pair.setBuyValues(Float.parseFloat(lastTrade.getPrice()));
                     pair.setCurrentCondition(currencyPairCondition.BUY);
@@ -102,6 +113,9 @@ public class exmoTradeProcess {
             }
         }
 
+        public void interrupt() {
+            this.interrupted = true;
+        }
 
         private boolean createBuyOrder(float buyPrice) {
             exmoOrderCreate buyOrder = new exmoOrderCreate();
@@ -116,10 +130,10 @@ public class exmoTradeProcess {
             if ("true".equals(buyOrder.getResult())) {
                 dao.createOrder(buyOrder);
                 pair.setBuyOrderId(buyOrder.getOrder_id());
-                logger.info(pair.name()+ ": ордер на покупку выставлен");
+                logger.info(pair.name() + ": ордер на покупку выставлен");
                 return true;
             } else {
-                logger.error(pair.name()+ ": ордер на покупку  не получилось, причина " + buyOrder.getError());
+                logger.error(pair.name() + ": ордер на покупку  не получилось, причина " + buyOrder.getError());
                 return false;
             }
         }
@@ -170,10 +184,10 @@ public class exmoTradeProcess {
             if ("true".equals(sellOrder.getResult())) {
                 pair.setBuyOrderId("0");
                 dao.createOrder(sellOrder);
-                logger.info(pair.name()+ ": ордер на продажу  выставлен");
+                logger.info(pair.name() + ": ордер на продажу  выставлен");
                 return true;
             } else {
-                logger.error(pair.name()+ ": ордер на продажу не получилось, причина " + sellOrder.getError());
+                logger.error(pair.name() + ": ордер на продажу не получилось, причина " + sellOrder.getError());
                 return false;
             }
         }
@@ -181,15 +195,15 @@ public class exmoTradeProcess {
         private void sell() {
             float currentValue = ticker.getSell_price();
             float buyValue = pair.getBuyValues();
-            float percentageOfExclusionSell =  pair.getPercentageOfExclusionSell();
-            float getPercentageOfNoReturn =  pair.getPercentageOfNoReturn();
+            float percentageOfExclusionSell = pair.getPercentageOfExclusionSell();
+            float getPercentageOfNoReturn = pair.getPercentageOfNoReturn();
             if (buyValue - currentValue > 0) {
                 float deviation = 100 - ((currentValue * 100) / buyValue);
                 logger.info(pair.getName() + ": цена ниже закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
                 if (deviation > getPercentageOfNoReturn) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в минус" + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);
-                    if(isSellOrderCreate){
+                    if (isSellOrderCreate) {
                         pair.setSellProfit(false);
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
@@ -203,7 +217,7 @@ public class exmoTradeProcess {
                 if (deviation > percentageOfExclusionSell) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в плюс " + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);
-                    if(isSellOrderCreate){
+                    if (isSellOrderCreate) {
                         pair.setSellProfit(true);
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
@@ -219,11 +233,11 @@ public class exmoTradeProcess {
         @Override
         public void run() {
             init();
-            while (!Thread.interrupted()) {
+            while (!interrupted) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.info(pair.getName() + ": поток на торговлю остановлен");
                 }
                 ticker = tickerProcess.returnTicker(pair);
                 switch (pair.getCurrentCondition()) {
@@ -240,15 +254,16 @@ public class exmoTradeProcess {
                         checkSellOrderNotClose();
                         break;
                 }
+            }
+            logger.info(pair.getName() + ": поток на торговлю завершился interrupted = "+interrupted);
         }
-    }
 
         private void checkBuyOrderNotClose() {
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
-            if(userOpenOrders.containsKey(pair.name())){
+            if (userOpenOrders.containsKey(pair.name())) {
                 logger.info(pair.getName() + ": имеются не закрытые ордера на покупку: " + userOpenOrders.get(pair.name()));
                 //todo проверять не надо ли их отменять
-            }else{
+            } else {
                 pair.setCurrentCondition(currencyPairCondition.BUY);            //куплено, ордера закрыты
                 dao.updateCurrencyPairSettings(pair);
                 logger.info(pair.getName() + ": ордера на покупку закрыты");
@@ -257,10 +272,10 @@ public class exmoTradeProcess {
 
         private void checkSellOrderNotClose() {
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
-            if(userOpenOrders.containsKey(pair.name())){
+            if (userOpenOrders.containsKey(pair.name())) {
                 logger.info(pair.getName() + ": имеются не закрытые ордера на продажу: " + userOpenOrders.get(pair.name()));
                 //todo проверять не надо ли их отменять
-            }else{
+            } else {
                 pair.setCurrentCondition(currencyPairCondition.SELL);            //продано, ордера закрыты
                 dao.updateCurrencyPairSettings(pair);
                 logger.info(pair.getName() + ": ордера на продажу закрыты");

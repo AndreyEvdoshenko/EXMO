@@ -38,8 +38,8 @@ public class exmoProcess {
     @Autowired
     private tradingDAO dao;
 
-    private volatile Map<String, exmoTicker> ticker;
-
+    @Autowired
+    exmoTradeProcess tradeProcess;
 
     public exmoProcess() {
 
@@ -50,5 +50,13 @@ public class exmoProcess {
         logger.info("@PostConstruct initProcess() invoke");
     }
 
+    public void runTradePair(String pairName){
+        //todo не безопасно когда нибуть отвалится
+        tradeProcess.runTradePair(currencyPair.valueOf(pairName));
+    }
+    public void stopTradePair(String pairName){
+        //todo не безопасно когда нибуть отвалится
+        tradeProcess.stopTradePair(currencyPair.valueOf(pairName));
+    }
 
 }

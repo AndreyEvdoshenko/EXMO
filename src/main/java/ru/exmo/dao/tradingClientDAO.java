@@ -126,13 +126,6 @@ public class tradingClientDAO implements tradingDAO {
 
     @Override
     public void updateCurrencyPairSettings(currencyPair pair) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("currentcondition", pair.getCurrentCondition().name());
-        params.put("pair", pair.getPair());
-        params.put("idorder", pair.getBuyOrderId());
-        jdbcTemplate.update(
-                "update exmoCurrencyairSettings set currentcondition = :currentcondition, idorder =:idorder WHERE pair = :pair",
-                params);
     }
 
 

@@ -23,39 +23,33 @@ public class exmoController {
     @Autowired
     exmoProcess process;
 
-    @RequestMapping("/getTrade")
-    public String getTrade() {
-        return "getTrade methods";
-    }
 
-    @RequestMapping("/getOrderBook")
-    public String getOrderBook() {
-        return "getTrade methods";
-    }
-
-    @RequestMapping("/getPairSettings")
-    public String getPairSettings(String pair) throws Exception {
-        for (Field field : currencyPair.class.getFields()) {
-            if (field.getName().equals(pair)) {
-                return field.getName();
-            }
-        }
-        throw new Exception("Pair " + pair + " not found");
-    }
-
-    @RequestMapping("/runTradePair")
+    @RequestMapping("/startTradePair")
     public String runTradePair(@RequestParam(value = "pair") String name) throws Exception {
         if (currencyPair.valueOf(name) != null) {
             process.runTradePair(name);
-            return "pair run success";
+            return "pair start success";
         }
         throw new Exception("Pair " + name + " not found");
     }
+
     @RequestMapping("/stopTradePair")
     public String stopTradePair(@RequestParam(value = "pair") String name) throws Exception {
         if (currencyPair.valueOf(name) != null) {
             process.stopTradePair(name);
             return "pair stop success";
+        }
+        throw new Exception("Pair " + name + " not found");
+    }
+
+    @RequestMapping("/debugTradePair")
+    public String debugTradePair(@RequestParam(value = "pair") String name, @RequestParam(value = "enabled") String debugEnabled) throws Exception {
+        if (currencyPair.valueOf(name) != null) {
+            if ("true".equals(debugEnabled) || "false".equals(debugEnabled)) {
+                process.debugTradePair(name,Boolean.parseBoolean(debugEnabled));
+                return "debug enabled success";
+            }
+            throw new Exception("enabled true or false "+debugEnabled);
         }
         throw new Exception("Pair " + name + " not found");
     }

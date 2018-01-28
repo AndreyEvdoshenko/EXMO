@@ -68,19 +68,31 @@ public class exmoTradeProcess {
         if (activeTradePair.containsKey(pair.name())) {
             tradePair currentTradePair = activeTradePair.get(pair.name());
             currentTradePair.interrupt();
+            activeTradePair.remove(pair.name());
         } else {
-            logger.info(pair.getName() + ": поток на торговлю не найденб останавливать нечего");
+            logger.error(pair.getName() + ": поток на торговлю не найденб останавливать нечего");
         }
 
     }
 
-    //**********************************************************************************************************************
+    public void debugEnabled(currencyPair pair, boolean enabled){
+        if (activeTradePair.containsKey(pair.name())) {
+            tradePair currentTradePair = activeTradePair.get(pair.name());
+            currentTradePair.debugEnabled(enabled);
+            logger.info(pair.getName() + ": дебаг режим "+enabled);
+        }else{
+            logger.error(pair.getName() + ": поток на торговлю не найден ");
+        }
+    }
+//**********************************************************************************************************************
     private class tradePair implements Runnable {
 
 
         private currencyPair pair;
-        private boolean interrupted = false;
         private volatile exmoTicker ticker;
+
+        private boolean interrupted = false;
+        private boolean debugEnabled = false;
 
         tradePair(currencyPair pair) {
             this.pair = pair;
@@ -106,7 +118,7 @@ public class exmoTradeProcess {
                     logger.info(pair.getName() + ": последняя операция - продажа актива");
                     pair.setCurrentCondition(currencyPairCondition.SELL);
                 } else if ("buy".equals(lastTrade.getType())) {
-                    logger.info(pair.getName() + ": последняя операция - окупка актива");
+                    logger.info(pair.getName() + ": последняя операция - покупка актива");
                     pair.setBuyValues(Float.parseFloat(lastTrade.getPrice()));
                     pair.setCurrentCondition(currencyPairCondition.BUY);
                 }
@@ -115,6 +127,10 @@ public class exmoTradeProcess {
 
         public void interrupt() {
             this.interrupted = true;
+        }
+
+        public void debugEnabled(boolean enabled){
+            this.debugEnabled = enabled;
         }
 
         private boolean createBuyOrder(float buyPrice) {
@@ -133,7 +149,7 @@ public class exmoTradeProcess {
                 logger.info(pair.name() + ": ордер на покупку выставлен");
                 return true;
             } else {
-                logger.error(pair.name() + ": ордер на покупку  не получилось, причина " + buyOrder.getError());
+                error(pair.name() + ": ордер на покупку  не получилось, причина " + buyOrder.getError());
                 return false;
             }
         }
@@ -145,7 +161,7 @@ public class exmoTradeProcess {
             float deviation;
             if (mediumValue - currentValue > 0) {
                 deviation = 100 - ((currentValue * 100) / mediumValue);
-                logger.info(pair.getName() + ": цена упала: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: -" + deviation);
+                info(pair.getName() + ": цена упала: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: -" + deviation);
                 if (deviation > percentageOfExclusionBuy) {
                     logger.info(pair.getName() + ": выставляем ордер на покупку по цене  " + currentValue);
                     logger.info("ticker " + pair.getName() + ": " + ticker);
@@ -156,14 +172,13 @@ public class exmoTradeProcess {
                         pair.setExclusion_medium(deviation);
                         pair.setBuyValues(currentValue);
                         pair.setSellValues(currentValue + (currentValue / 100 * pair.getPercentageOfExclusionSell()));
-                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else if (mediumValue - currentValue < 0) {
                 deviation = ((currentValue * 100) / mediumValue) - 100;
-                logger.info(pair.getName() + ": цена поднялась: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
+                info(pair.getName() + ": цена поднялась: средняя за 5 минут: " + mediumValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
             } else {
-                logger.info(pair.getName() + ": цена за 5 минут не изменилась от средней: " + mediumValue + ", текущаяя: " + currentValue);
+                info(pair.getName() + ": цена за 5 минут не изменилась от средней: " + mediumValue + ", текущаяя: " + currentValue);
             }
         }
 
@@ -187,7 +202,7 @@ public class exmoTradeProcess {
                 logger.info(pair.name() + ": ордер на продажу  выставлен");
                 return true;
             } else {
-                logger.error(pair.name() + ": ордер на продажу не получилось, причина " + sellOrder.getError());
+                error(pair.name() + ": ордер на продажу не получилось, причина " + sellOrder.getError());
                 return false;
             }
         }
@@ -199,7 +214,7 @@ public class exmoTradeProcess {
             float getPercentageOfNoReturn = pair.getPercentageOfNoReturn();
             if (buyValue - currentValue > 0) {
                 float deviation = 100 - ((currentValue * 100) / buyValue);
-                logger.info(pair.getName() + ": цена ниже закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
+                info(pair.getName() + ": цена ниже закупки: " + buyValue + ", текущаяя:  " + currentValue + ", отклонение: -" + deviation);
                 if (deviation > getPercentageOfNoReturn) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в минус" + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);
@@ -208,12 +223,11 @@ public class exmoTradeProcess {
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
                         pair.setCurrentCondition(CREATE_SELL_ORDER);
-                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else if (buyValue - currentValue < 0) {
                 float deviation = ((currentValue * 100) / buyValue) - 100;
-                logger.info(pair.getName() + ": цена выше закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
+                info(pair.getName() + ": цена выше закупки: " + buyValue + ", текущаяя: " + currentValue + ", отклонение: " + deviation);
                 if (deviation > percentageOfExclusionSell) {
                     logger.info(pair.getName() + ": выставляем ордер на продажу по цене, выходим в плюс " + currentValue);
                     boolean isSellOrderCreate = createSellOrder(currentValue);
@@ -222,11 +236,10 @@ public class exmoTradeProcess {
                         pair.setExclusion_buy(deviation);
                         pair.setSellValues(currentValue);
                         pair.setCurrentCondition(CREATE_SELL_ORDER);
-                        dao.updateCurrencyPairSettings(pair);
                     }
                 }
             } else {
-                logger.info(pair.getName() + ": цена не изменилась от закупки: " + buyValue + ", текущаяя: " + currentValue);
+                info(pair.getName() + ": цена не изменилась от закупки: " + buyValue + ", текущаяя: " + currentValue);
             }
         }
 
@@ -237,7 +250,7 @@ public class exmoTradeProcess {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    logger.info(pair.getName() + ": поток на торговлю остановлен");
+                    info(pair.getName() + ": поток на торговлю остановлен");
                 }
                 ticker = tickerProcess.returnTicker(pair);
                 switch (pair.getCurrentCondition()) {
@@ -261,25 +274,33 @@ public class exmoTradeProcess {
         private void checkBuyOrderNotClose() {
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
             if (userOpenOrders.containsKey(pair.name())) {
-                logger.info(pair.getName() + ": имеются не закрытые ордера на покупку: " + userOpenOrders.get(pair.name()));
+                info(pair.getName() + ": имеются не закрытые ордера на покупку: " + userOpenOrders.get(pair.name()));
                 //todo проверять не надо ли их отменять
             } else {
                 pair.setCurrentCondition(currencyPairCondition.BUY);            //куплено, ордера закрыты
-                dao.updateCurrencyPairSettings(pair);
-                logger.info(pair.getName() + ": ордера на покупку закрыты");
+                info(pair.getName() + ": ордера на покупку закрыты");
             }
         }
 
         private void checkSellOrderNotClose() {
             Map<String, List<exmoUserOpenOrders>> userOpenOrders = tradingApi.returnUserOpenOrders();
             if (userOpenOrders.containsKey(pair.name())) {
-                logger.info(pair.getName() + ": имеются не закрытые ордера на продажу: " + userOpenOrders.get(pair.name()));
+                info(pair.getName() + ": имеются не закрытые ордера на продажу: " + userOpenOrders.get(pair.name()));
                 //todo проверять не надо ли их отменять
             } else {
                 pair.setCurrentCondition(currencyPairCondition.SELL);            //продано, ордера закрыты
-                dao.updateCurrencyPairSettings(pair);
-                logger.info(pair.getName() + ": ордера на продажу закрыты");
+                info(pair.getName() + ": ордера на продажу закрыты");
             }
+        }
+
+        private void info(String log){
+            if(debugEnabled){
+                logger.info(log);
+            }
+        }
+
+        private void error(String log){
+                logger.error(log);
         }
 
 

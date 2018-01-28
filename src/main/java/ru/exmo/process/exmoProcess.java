@@ -54,9 +54,16 @@ public class exmoProcess {
         //todo не безопасно когда нибуть отвалится
         tradeProcess.runTradePair(currencyPair.valueOf(pairName));
     }
+
     public void stopTradePair(String pairName){
         //todo не безопасно когда нибуть отвалится
         tradeProcess.stopTradePair(currencyPair.valueOf(pairName));
     }
+
+    public void debugTradePair(String pairName,boolean enabled){
+        //todo не безопасно когда нибуть отвалится
+        tradeProcess.debugEnabled(currencyPair.valueOf(pairName),enabled);
+    }
+
 
 }
